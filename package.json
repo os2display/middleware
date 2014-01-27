@@ -1,0 +1,10 @@
+{
+  "name": "infostander",
+  "description": "Infostander proxy to handle communication between symfony and the front-end",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "socket.io" : "0.9.x",
+    "redis" : "0.10.x"
+  }
+}
