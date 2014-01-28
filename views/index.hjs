@@ -9,6 +9,6 @@
   	<script src="/socket.io/socket.io.js"></script>
   	<script src="/javascripts/stander.js"></script>
   	<h1>{{ title }}</h1>
-  	<p>Test page</p>
+  	<p>This page could be used to test the service and explain how to setup a new screen.</p>
   </body>
 </html>
