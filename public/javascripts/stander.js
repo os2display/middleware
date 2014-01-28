@@ -6,7 +6,7 @@ $(document).ready(function() {
   }
 
   $.ajax({
-    type: 'POST',
+    type: 'GET',
     data: {
       username: 'test',
 	    password: 'password'

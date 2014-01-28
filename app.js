@@ -30,10 +30,10 @@ app.use(app.router);
 
 // Start the server.
 server.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+  console.log('Express server with socket.io is listening on port ' + app.get('port'));
 })
 
-// Ensure that the JWT is used to authenticate the connection.
+// Ensure that the JWT is used to authenticate socket.io connections.
 sio.configure(function (){
   sio.set('authorization', socketio_jwt.authorize({
     secret: jwt_secret,

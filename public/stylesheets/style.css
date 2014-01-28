@@ -12,6 +12,5 @@ a {
   background-color: #EEE;
   color: black;
   width: 565px;
-  height: 400px;
-  overflow-x: scroll;
+  min-height: 400px;
 }
