@@ -1,8 +1,17 @@
 body {
-  padding: 50px;
+  padding: 25px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+.messages {
+  padding: 10px;
+  background-color: #EEE;
+  color: black;
+  width: 565px;
+  height: 400px;
+  overflow-x: scroll;
 }

@@ -43,17 +43,18 @@ sio.configure(function (){
 
 // Handle socket events.
 sio.on('connection', function(socket) {
-  console.log(socket.handshake.decoded_token.email, 'connected');
-  socket.emit('init', {msg:"test"});
+  var count = 0
+  setInterval(function() {
+  	count++;
+  	socket.emit('ping', { msg: count });
+  }, 3000);
 })
-
 
 // Get dependencies.
 var routes = require('./routes/default');
 
 // Set express routes.
 app.get('/', routes.index);
-
 app.post('/login', function(req, res) {
 	routes.loginCallback(req, res, jwt, jwt_secret);
 });
