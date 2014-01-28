@@ -8,9 +8,6 @@ var path = require('path');
 var express = require('express');
 var http = require('http');
 
-// Get dependencies.
-var routes = require('./routes');
-
 // Basic app setup.
 var app = express();
 var server = http.createServer(app);
@@ -36,6 +33,7 @@ server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 })
 
+// Ensure that the JWT is used to authenticate the connection.
 sio.configure(function (){
   sio.set('authorization', socketio_jwt.authorize({
     secret: jwt_secret,
@@ -45,23 +43,18 @@ sio.configure(function (){
 
 // Handle socket events.
 sio.on('connection', function(socket) {
-  console.log(socket.handshake.decoded_token.email, 'connected');
-  socket.emit('init', {msg:"test"});
+  var count = 0
+  setInterval(function() {
+  	count++;
+  	socket.emit('ping', { msg: count });
+  }, 3000);
 })
+
+// Get dependencies.
+var routes = require('./routes/default');
 
 // Set express routes.
 app.get('/', routes.index);
-
-// Login request.
-app.post('/login', function (req, res) {
-  
-  var profile = {
-    username: req.body.username,
-    password: req.body.password
-  };
-
-  // We are sending the profile inside the token
-  var token = jwt.sign(profile, jwt_secret, { expiresInMinutes: 60*5 });
-
-  res.json({token: token});
+app.post('/login', function(req, res) {
+	routes.loginCallback(req, res, jwt, jwt_secret);
 });

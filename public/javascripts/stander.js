@@ -1,19 +1,42 @@
+$(document).ready(function() {
 
-$.ajax({
-  type: 'POST',
-  data: {
-    username: 'test',
-	password: 'password'
-  },
-  url: '/login'
-}).done(function (result) {
-  var sio = io.connect('http://127.0.0.1:3000', { query: 'token=' + result.token });
+  function setMessage(msg) {
+    var m = $('.messages ol');
+    m.append($('<li>' + msg + '</li>'));
+  }
 
-  sio.socket.on('error', function (reason){
-    console.error('Unable to connect Socket.IO', reason);
-  });
+  $.ajax({
+    type: 'POST',
+    data: {
+      username: 'test',
+	    password: 'password'
+    },
+    url: '/login'
+  }).done(function (result) {
+    var sio = io.connect('http://127.0.0.1:3000', { query: 'token=' + result.token });
+    sio.on('error', function (reason) {
+      setMessage('Error: ' + reason);
+    });
 
-  sio.on('init', function (data) {
-    console.log(data);
+    sio.on('connecting', function (data) {
+      setMessage('Connecting to server via a ' + data);
+    });
+
+    sio.on('connect', function () {
+      setMessage('Connected to the server.');
+    });
+
+    sio.on('disconnect', function () {
+      setMessage('Disconnect from the server.');
+    });
+
+    sio.on('reconnecting', function () {
+      setMessage('Re-connecting to the server.');
+    });
+
+    sio.on('ping', function (data) {
+      setMessage('Message received (ping): ' + data.msg);
+      console.log(data);
+    });
   });
 });
