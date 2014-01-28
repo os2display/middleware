@@ -8,8 +8,11 @@ var path = require('path');
 var express = require('express');
 var http = require('http');
 
+// Get dependencies.
+var validator = require('validator');
 var routes = require('./routes');
 
+// Basic app setup.
 var app = express();
 var server = http.createServer(app);
 var sio = require('socket.io').listen(server);
