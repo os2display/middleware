@@ -7,6 +7,8 @@
   	"express" : "3.4.x",
     "socket.io" : "0.9.x",
     "redis" : "0.10.x",
-    "hjs" : "0.0.6"
+    "hjs" : "0.0.6",
+    "jsonwebtoken" : "0.1.0",
+    "socketio-jwt" : "2.0.1"
   }
 }
