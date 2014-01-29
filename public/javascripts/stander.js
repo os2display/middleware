@@ -36,7 +36,6 @@ $(document).ready(function() {
 
     sio.on('ping', function (data) {
       setMessage('Message received (ping): ' + data.msg);
-      console.log(data);
     });
   });
 });
