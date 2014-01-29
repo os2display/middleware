@@ -13,7 +13,7 @@ $(document).ready(function() {
     },
     url: '/login'
   }).done(function (result) {
-    var sio = io.connect('http://127.0.0.1:3000', { query: 'token=' + result.token });
+    var sio = io.connect('//localhost:3000', { query: 'token=' + result.token });
     sio.on('error', function (reason) {
       setMessage('Error: ' + reason);
     });
