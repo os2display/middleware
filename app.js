@@ -6,11 +6,19 @@
 // Setup the basic variables need to create the server
 var path = require('path');
 var express = require('express');
-var http = require('http');
+var https = require('https');
+var fs = require('fs');
+
+// Certificate settings.
+var options = {
+  key: fs.readFileSync('ssl/server.key'),
+  cert: fs.readFileSync('ssl/server.cert'),
+  //ca: fs.readFileSync('./etc/ssl/ebscerts/bundle.crt')
+};
 
 // Basic app setup.
 var app = express();
-var server = http.createServer(app);
+var server = https.createServer(options, app);
 var sio = require('socket.io').listen(server);
 
 // Token based auth.
