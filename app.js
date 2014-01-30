@@ -26,6 +26,12 @@ var socketio_jwt = require('socketio-jwt');
 var jwt = require('jsonwebtoken');
 var jwt_secret = 'foo bar big secret';
 
+// Set socket.io configuration.
+//sio.enable('browser client minification');
+//sio.enable('browser client etag');
+//sio.enable('browser client gzip'); 
+sio.set('log level', 10); 
+
 // Set express app configuration.
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
