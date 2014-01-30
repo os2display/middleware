@@ -21,12 +21,13 @@ exports.loginCallback = function (req, res, jwt, jwt_secret) {
     password: req.body.password
   };
 
-  var token = ''; 
   // HERE A CALL TO THE BACKEND TO VERIFY THE USER SHOULD BE PERFROMED
   if (profile.username == 'test' && profile.password == 'password') {
 	// We are sending the profile inside the token
-    token = jwt.sign(profile, jwt_secret, { expiresInMinutes: 60*5 });
+    var token = jwt.sign(profile, jwt_secret, { expiresInMinutes: 60*24*365 });
+    res.json({token: token});
   }
-
-  res.json({token: token});
+  else {
+    res.send(403);
+  }
 };

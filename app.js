@@ -61,7 +61,7 @@ sio.on('connection', function(socket) {
   setInterval(function() {
   	count++;
   	socket.emit('ping', { msg: count });
-  }, 3000);
+  }, 1000);
 })
 
 // Get dependencies.

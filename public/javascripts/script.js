@@ -42,10 +42,19 @@ $(document).ready(function() {
       }),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
-      url: '/login'
-    }).done(function (result) {
-      // Result from the server, try to make socket connection.
-      connect(result.token);
+      url: '/login',
+      success: function (data, text) {
+        // Result from the server, try to make socket connection.
+        connect(data.token);
+      },
+      error: function (request, status, error) {
+        if (request.status === 403) {
+          setMessage('Please try another username or password', 'bg-danger');
+        }
+        else {
+          setMessage(error, 'bg-danger');
+        }
+      }
     });
   });
 });
