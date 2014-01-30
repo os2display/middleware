@@ -1,20 +1,43 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{{ title }}</title>    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <!-- Load bootstrap theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
     <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+    <!-- Load socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- Load custom scripts -->
+    <script src="/javascripts/script.js"></script>
   </head>
   <body>
-    <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
-  	<script src="/socket.io/socket.io.js"></script>
-  	<script src="/javascripts/stander.js"></script>
-  	<h1>{{ title }}</h1>
-  	<p>This page could be used to test the service and explain how to setup a new screen.</p>
-    <br />
-    <p>Messages from the socket:</p>
-    <div class="messages">      
-      <ol>
-      </ol>
+    <!-- Wrap all page content here -->
+    <div id="wrap" class="container">
+      <!-- Login form -->
+      <form class="form-signin" role="form">
+        <h2 class="form-signin-heading">Sign in <small>Beta test</small></h2>
+        <input type="text" class="form-control username" placeholder="Username" required autofocus>
+        <input type="password" class="form-control password" placeholder="Password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      </form>
+
+      <div class="message text-center"><p><!-- Message --></p></div>
+
+    </div>
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-center">Test site node.js information system proxy.</p>
+      </div>
     </div>
   </body>
 </html>

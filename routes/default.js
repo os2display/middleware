@@ -15,15 +15,18 @@ exports.index = function (req, res) {
 /**
  * Login callback (/login)
  */
-exports.loginCallback = function (req, res, jwt, jwt_secret) {
-  // HERE A CALL TO THE BACKEND TO VERIFY THE USER SHOULD BE PERFROMED
+exports.loginCallback = function (req, res, jwt, jwt_secret) {  
   var profile = {
     username: req.body.username,
     password: req.body.password
   };
 
-  // We are sending the profile inside the token
-  var token = jwt.sign(profile, jwt_secret, { expiresInMinutes: 60*5 });
+  var token = ''; 
+  // HERE A CALL TO THE BACKEND TO VERIFY THE USER SHOULD BE PERFROMED
+  if (profile.username == 'test' && profile.password == 'password') {
+	// We are sending the profile inside the token
+    token = jwt.sign(profile, jwt_secret, { expiresInMinutes: 60*5 });
+  }
 
   res.json({token: token});
 };
