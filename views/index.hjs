@@ -11,6 +11,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
 
     <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="/javascripts/jquery.cookie.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
 
     <!-- Load socket.io -->
@@ -32,6 +33,8 @@
 
       <div class="message text-center"><p><!-- Message --></p></div>
 
+
+      <button class="btn btn-lg btn-primary btn-block ping">Ping</button>
     </div>
 
     <div id="footer">

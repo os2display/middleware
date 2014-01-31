@@ -55,20 +55,34 @@ sio.configure(function (){
   }))
 });
 
-// Handle socket events.
+/************************
+ * Socket events
+ ***************/
 sio.on('connection', function(socket) {
-  var count = 0
-  setInterval(function() {
-  	count++;
-  	socket.emit('ping', { msg: count });
-  }, 1000);
-})
+  console.log('Client connected');
 
-// Get dependencies.
+  // Test the connection.
+  socket.on('ping', function (data) {
+    socket.emit('pong', {});
+  });
+});
+// Load routes.
 var routes = require('./routes/default');
 
-// Set express routes.
+/************************
+ * Backend API
+ *************/
 app.get('/', routes.index);
+
 app.post('/login', function(req, res) {
-	routes.loginCallback(req, res, jwt, jwt_secret);
+	routes.login(req, res, jwt, jwt_secret);
+});
+
+app.post('/pushScreens', routes.pushScreens);
+
+/************************
+ * Client API
+ ************/
+app.post('/activate', function(req, res) {
+  routes.activate(req, res, jwt, jwt_secret);
 });
