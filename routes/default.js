@@ -5,6 +5,11 @@
 
 var jwt = require('jsonwebtoken');
 
+// Load configuration.
+var config = require('nconf');
+config.file({ file: 'config.json' });
+
+
 /**
  * Index page (/).
  */
@@ -24,9 +29,9 @@ exports.login = function (req, res, jwt, jwt_secret) {
     password: req.body.password
   };
 
-  // HERE A CALL TO THE BACKEND TO VERIFY THE USER SHOULD BE PERFROMED
-  if (profile.username == 'test' && profile.password == 'password') {
-	// We are sending the profile inside the token
+  var maintenance = config.get('maintenance')
+  if (profile.username === maintenance.username && profile.password === maintenance.password) {
+    // We are sending the profile inside the token
     var token = jwt.sign(profile, jwt_secret, { expiresInMinutes: 60*24*365 });
     res.json({token: token});
   }
