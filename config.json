@@ -1,4 +1,5 @@
 {
+  "sitename": "Beta test",
   "port": 3000,
   "ssl": {
     "key": "ssl/server.key",
@@ -12,5 +13,5 @@
     "username": "admin",
     "password": "password"
   },
-  "sitename": "Beta test"
+  "backends": [ "127.0.0.1" ]
 }

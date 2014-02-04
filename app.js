@@ -73,8 +73,6 @@ sio.configure(function (){
  * Socket events
  ***************/
 sio.on('connection', function(socket) {
-  console.log('Client connected');
-
   // Test the connection.
   socket.on('ping', function (data) {
     socket.emit('pong', {});
@@ -84,7 +82,7 @@ sio.on('connection', function(socket) {
 /************************
  * Application routes
  ********************/
-var routes = require('./routes/app');
+var routes = require('./routes/local');
 
 app.get('/', routes.index);
 
@@ -95,15 +93,15 @@ app.post('/login', function(req, res) {
 /************************
  * Backend API
  *************/
-var routes_rest = require('./routes/rest');
+var routes_backend = require('./routes/backend');
 
-app.post('/pushScreens', routes_rest.pushScreens);
+app.post('/pushScreens', routes_backend.pushScreens);
 
 /************************
  * Client API
  ************/
-var routes_socket = require('./routes/rest');
+var routes_frontend = require('./routes/frontend');
 
 app.post('/activate', function(req, res) {
-  routes_socket.activate(req, res, jwt, jwt_secret);
+  routes_frontend.activate(req, res, jwt, jwt_secret);
 });
