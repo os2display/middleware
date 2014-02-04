@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }}</title>
+    <title>{{ sitename }}</title>
     <!-- Load bootstrap theme -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
@@ -25,21 +25,18 @@
     <div id="wrap" class="container">
       <!-- Login form -->
       <form class="form-signin" role="form">
-        <h2 class="form-signin-heading">Sign in <small>Beta test</small></h2>
+        <h2 class="form-signin-heading">Sign in <small>{{ sitename }}</small></h2>
         <input type="text" class="form-control username" placeholder="Username" required autofocus>
         <input type="password" class="form-control password" placeholder="Password" required>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
       </form>
 
       <div class="message text-center"><p><!-- Message --></p></div>
-
-
-      <button class="btn btn-lg btn-primary btn-block ping">Ping</button>
     </div>
 
     <div id="footer">
       <div class="container">
-        <p class="text-center">Test site node.js information system proxy.</p>
+        <p class="text-center">{{ sitename }}<br />Publishing information proxy</p>
       </div>
     </div>
   </body>

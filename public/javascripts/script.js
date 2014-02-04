@@ -34,12 +34,11 @@ $(document).ready(function() {
   }
 
   // Add event handler to click button.
-  $('.ping').click(function() {
-    if (socket != undefined) {
-      socket.emit('ping', {});
-    }
-  });
-
+  //$('.ping').click(function() {
+  //  if (socket != undefined) {
+  //    socket.emit('ping', {});
+  //  }
+  //});
 
   // Hook into the login form.
   $('.form-signin button[type=submit]').click(function(e) {

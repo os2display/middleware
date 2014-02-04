@@ -11,5 +11,6 @@
   "maintenance": {
     "username": "admin",
     "password": "password"
-  }
+  },
+  "sitename": "Beta test"
 }

@@ -80,23 +80,30 @@ sio.on('connection', function(socket) {
     socket.emit('pong', {});
   });
 });
-// Load routes.
-var routes = require('./routes/default');
 
 /************************
- * Backend API
- *************/
+ * Application routes
+ ********************/
+var routes = require('./routes/app');
+
 app.get('/', routes.index);
 
 app.post('/login', function(req, res) {
 	routes.login(req, res, jwt, jwt_secret);
 });
 
-app.post('/pushScreens', routes.pushScreens);
+/************************
+ * Backend API
+ *************/
+var routes_rest = require('./routes/rest');
+
+app.post('/pushScreens', routes_rest.pushScreens);
 
 /************************
  * Client API
  ************/
+var routes_socket = require('./routes/rest');
+
 app.post('/activate', function(req, res) {
-  routes.activate(req, res, jwt, jwt_secret);
+  routes_socket.activate(req, res, jwt, jwt_secret);
 });
