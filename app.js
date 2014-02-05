@@ -94,7 +94,21 @@ var Screen = require('./lib/screen');
  * Socket events
  ***************/
 sio.on('connection', function(socket) {
-  // Test the connection.
+  console.log(socket.id);
+
+  socket.on('ready', function(data) {
+    // Create new screen object.
+    var instance = new Screen(data.token);
+    instance.load();
+
+    // Store socket id.
+    instance.set('socket', socket.id);
+    
+    // Attach to room.
+    
+  });
+
+  // Test event.
   socket.on('ping', function (data) {
     socket.emit('pong', {});
   });

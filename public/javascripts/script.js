@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
   var socket = undefined;
+  var token =  undefined;
 
   function setMessage(msg, type) {
     var m = $('.message p');    
@@ -9,7 +10,7 @@ $(document).ready(function() {
     m.text(msg);
   }
 
-  function connect(token) {
+  function connect() {
     socket = io.connect('//localhost:3000', { query: 'token=' + token });
     socket.socket.on('error', function (reason) {
       setMessage(reason, 'bg-danger');
@@ -18,6 +19,8 @@ $(document).ready(function() {
     socket.on('connect', function () {
       setMessage('Connected to the server.', 'bg-info');
       $('.form-signin').hide();
+
+      socket.emit('ready', { token: token});      
     });
 
     socket.on('disconnect', function () {
@@ -53,8 +56,9 @@ $(document).ready(function() {
       dataType: "json",
       url: '/login',
       success: function (data, text) {
+        token = data.token;
         // Result from the server, try to make socket connection.
-        connect(data.token);
+        connect();
       },
       error: function (request, status, error) {
         if (request.status === 403) {
