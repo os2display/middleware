@@ -101,17 +101,18 @@ sio.on('connection', function(socket) {
   socket.on('ready', function(data) {
     // Create new screen object.
     var instance = new Screen(data.token);
-    instance.load(function() {
-      // Check if content exits and push it.
-      console.log('Screen loaded');
-      console.log(instance);
+    instance.load();
+
+    instance.on('loaded', function() {
+      // Store socket id.
+      instance.set('socket', socket.id);      
+
+      // Join rooms/groups.
+      var groups = instance.get('groups')
+      for (var i in groups) {
+        socket.join(groups[i]);
+      }    
     });
-
-    // Store socket id.
-    instance.set('socket', socket.id);
-    
-    // Attach to room.
-
   });
 
   // Test event.
