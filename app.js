@@ -61,6 +61,20 @@ server.listen(app.get('port'), function(){
   }
 });
 
+// Connect to redis server.
+var redis = require("redis");
+var rconf = config.get('redis')
+global.redisClient = redis.createClient(rconf.port, rconf.host, { 'auth_pass': rconf.auth });
+redisClient.on("error", function (err) {
+  console.log(err);
+});
+redisClient.on("connect", function (err) {
+  if (config.get('debug')) {
+    console.log('Connected to redis server at: ' + rconf.host);
+  }
+});
+
+
 // Ensure that the JWT is used to authenticate socket.io connections.
 sio.configure(function (){
   sio.set('authorization', socketio_jwt.authorize({
@@ -69,7 +83,14 @@ sio.configure(function (){
   }))
 });
 
-/************************
+
+/************************************
+ * Load application objects
+ **************************/
+var rooms = [];
+var Screen = require('./lib/screen');
+
+/************************************
  * Socket events
  ***************/
 sio.on('connection', function(socket) {
@@ -79,7 +100,7 @@ sio.on('connection', function(socket) {
   });
 });
 
-/************************
+/************************************
  * Application routes
  ********************/
 var routes = require('./routes/local');
@@ -90,14 +111,14 @@ app.post('/login', function(req, res) {
 	routes.login(req, res, jwt, jwt_secret);
 });
 
-/************************
+/************************************
  * Backend API
  *************/
 var routes_backend = require('./routes/backend');
 
 app.post('/pushScreens', routes_backend.pushScreens);
 
-/************************
+/************************************
  * Client API
  ************/
 var routes_frontend = require('./routes/frontend');
