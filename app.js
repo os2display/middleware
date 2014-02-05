@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * @file
  * First attempt on creating a proxy with socket.io.
@@ -105,7 +107,7 @@ sio.on('connection', function(socket) {
     instance.set('socket', socket.id);
     
     // Attach to room.
-    
+
   });
 
   // Test event.
