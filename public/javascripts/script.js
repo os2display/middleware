@@ -20,7 +20,7 @@ $(document).ready(function() {
       setMessage('Connected to the server.', 'bg-info');
       $('.form-signin').hide();
 
-      socket.emit('ready', { token: token});      
+      socket.emit('ready', { token: token });      
     });
 
     socket.on('disconnect', function () {

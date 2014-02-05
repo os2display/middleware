@@ -101,7 +101,11 @@ sio.on('connection', function(socket) {
   socket.on('ready', function(data) {
     // Create new screen object.
     var instance = new Screen(data.token);
-    instance.load();
+    instance.load(function() {
+      // Check if content exits and push it.
+      console.log('Screen loaded');
+      console.log(instance);
+    });
 
     // Store socket id.
     instance.set('socket', socket.id);
