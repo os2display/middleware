@@ -144,6 +144,17 @@ app.post('/pushScreens', routes_backend.pushScreens);
  ************/
 var routes_frontend = require('./routes/frontend');
 
+// Allow cross domain (CORS) to the activate callback.
+app.options('/activate', function(req, res) {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+  res.header('Access-Control-Allow-Methods', 'POST');
+  res.end();
+});
+
 app.post('/activate', function(req, res) {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+  res.header('Access-Control-Allow-Methods', 'POST');
   routes_frontend.activate(req, res, jwt, jwt_secret);
 });

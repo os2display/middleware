@@ -13,15 +13,17 @@ var jwt = require('jsonwebtoken');
  * used to establish the socket connection.
  */
 exports.activate = function (req, res, jwt, jwt_secret) {
+  console.log('test');
+
   var activationCode = req.body.activationCode;
   if (activationCode != undefined) {
 
-    // @todo: send request to backend about activation code.
-    if (activationCode === 12345) {
-
+    // @todo: send request to backend about activation code and token.
+    if (activationCode == '12345') {
+      
       // @todo: store screen information from the backend.
       // @todo: Sign screen information NOT activation code.
-      var token = jwt.sign(activationCode, jwt_secret, { expiresInMinutes: 60*24*365 });
+      var token = jwt.sign(activationCode, jwt_secret);
       res.json({token: token});
     }
     else {
