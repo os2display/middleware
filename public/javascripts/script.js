@@ -54,7 +54,7 @@ $(document).ready(function() {
       }),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
-      url: '/login',
+      url: 'login',
       success: function (data, text) {
         token = data.token;
         // Result from the server, try to make socket connection.
