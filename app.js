@@ -76,7 +76,6 @@ redisClient.on("connect", function (err) {
   }
 });
 
-
 // Ensure that the JWT is used to authenticate socket.io connections.
 sio.configure(function (){
   sio.set('authorization', socketio_jwt.authorize({
@@ -84,7 +83,6 @@ sio.configure(function (){
   	handshake: true
   }))
 });
-
 
 /************************************
  * Load application objects
@@ -96,13 +94,16 @@ var Screen = require('./lib/screen');
  * Socket events
  ***************/
 sio.on('connection', function(socket) {
-  console.log(socket.id);
 
+  /**
+   * Ready event.
+   */
   socket.on('ready', function(data) {
     // Create new screen object.
     var instance = new Screen(data.token);
-    instance.load();
 
+    // Load screen which may trick a call to the backend.
+    instance.load();
     instance.on('loaded', function() {
       // Store socket id.
       instance.set('socket', socket.id);      
@@ -111,13 +112,30 @@ sio.on('connection', function(socket) {
       var groups = instance.get('groups')
       for (var i in groups) {
         socket.join(groups[i]);
-      }    
+      }
+
+      // Send a 200 ready code back to the client.
+      socket.emit('ready', { statusCode: 200 })
+
+      // @todo: Push content, if any exists.
     });
   });
 
-  // Test event.
-  socket.on('ping', function (data) {
-    socket.emit('pong', {});
+  /**
+   * Pause event.
+   */
+  socket.on('pause', function(data) {
+    // Get a list of rooms that this socket is in.
+    var rooms = sio.sockets.manager.roomClients[socket.id];
+
+    // Remove the socket from the rooms.
+    for (var room in rooms) {
+      room = room.substring(1);
+      socket.leave(room);
+    }
+
+    // Send feedback to the client.
+    socket.emit('pause', { statusCode: 200 })
   });
 });
 
