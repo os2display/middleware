@@ -173,7 +173,8 @@ app.post('/login', function(req, res) {
  *************/
 var routes_backend = require('./routes/backend');
 
-app.post('/pushScreens', routes_backend.pushScreens);
+app.post('/push/screens', routes_backend.screenPush);
+app.post('/push/reload', routes_backend.screenReload);
 
 /************************************
  * Client API
