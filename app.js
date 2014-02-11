@@ -32,10 +32,12 @@ if (config.get('ssl').active) {
     options.ca = fs.readFileSync(config.get('ssl').key.ca);
   }
 
+  // Start the https server.
   http = require('https');
   server = http.createServer(options, app);
 }
 else {
+  // Start the http server.
   http = require('http');
   server = http.createServer(app);
 }
