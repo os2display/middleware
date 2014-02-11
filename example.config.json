@@ -2,6 +2,7 @@
   "sitename": "Beta test",
   "port": 3000,
   "ssl": {
+    "active": false,
     "key": "ssl/server.key",
     "cert": "ssl/server.cert",
     "ca": false

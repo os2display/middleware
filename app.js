@@ -8,23 +8,39 @@
 // Setup the basic variables need to create the server
 var path = require('path');
 var express = require('express');
-var https = require('https');
 var fs = require('fs');
 var config = require('nconf');
+
+// Start the app.
+var app = express();
 
 // Load configuration.
 config.file({ file: 'config.json' });
 
-// Certificate settings.
-var options = {
-  key: fs.readFileSync(config.get('ssl').key),
-  cert: fs.readFileSync(config.get('ssl').cert),
-  //ca: fs.readFileSync('./etc/ssl/ebscerts/bundle.crt')
-};
+// As the server proxies (nginx) the web-socket and socket.io.js
+// request. This trick is used to make the local instances work.
+var http = undefined;
+var server = undefined;
+if (config.get('ssl').active) {
+  // Certificate settings.
+  var options = {
+    key: fs.readFileSync(config.get('ssl').key),
+    cert: fs.readFileSync(config.get('ssl').cert),
+    //ca: fs.readFileSync('./etc/ssl/ebscerts/bundle.crt')
+  };
+  if (config.get('ssl').key.ca) {
+    options.ca = fs.readFileSync(config.get('ssl').key.ca);
+  }
 
-// Basic app setup.
-var app = express();
-var server = https.createServer(options, app);
+  http = require('https');
+  server = http.createServer(options, app);
+}
+else {
+  http = require('http');
+  server = http.createServer(app);
+}
+
+// Add socket.io to the mix.
 var sio = require('socket.io').listen(server);
 
 // Token based auth.
