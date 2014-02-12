@@ -184,6 +184,9 @@ var routes_backend = require('./routes/backend');
 
 app.post('/screen/update', routes_backend.screenUpdate);
 app.post('/screen/reload', routes_backend.screenReload);
+app.post('/push/channel', routes_backend.pushChannel);
+app.post('/push/emergency', routes_backend.pushEmergency);
+app.post('/status', routes_backend.status);
 
 /************************************
  * Client API

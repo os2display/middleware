@@ -76,3 +76,24 @@ exports.screenReload = function (req, res) {
     res.send(500);
   }
 }
+
+/**
+ * Implements push channel content.
+ */
+exports.pushChannel = function (req, res) {
+  res.send(501);
+}
+
+/**
+ * Implements emergency content push.
+ */
+exports.pushEmergency = function (req, res) {
+  res.send(501);
+}
+
+/**
+ * Implements status request.
+ */
+exports.status = function (req, res) {
+  res.send(501);
+}
