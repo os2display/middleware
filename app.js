@@ -44,6 +44,7 @@ else {
 
 // Add socket.io to the mix.
 var sio = require('socket.io').listen(server);
+global.sio = sio;
 
 // Token based auth.
 var socketio_jwt = require('socketio-jwt');
@@ -85,7 +86,7 @@ server.listen(app.get('port'), function(){
 var redis = require("redis");
 var rconf = config.get('redis')
 global.redisClient = redis.createClient(rconf.port, rconf.host, { 'auth_pass': rconf.auth });
-redisClient.on("error", function (err) {
+redisClient.on('error', function (err) {
   console.log(err);
 });
 redisClient.on("connect", function (err) {
@@ -122,9 +123,12 @@ sio.on('connection', function(socket) {
 
     // Load screen which may trick a call to the backend.
     instance.load();
-    instance.on('loaded', function() {
+    instance.on('loaded', function(data) {
       // Store socket id.
-      instance.set('socket', socket.id);      
+      instance.set('socketID', socket.id);
+
+      // The screen have been updated with socket ID, so save it.
+      instance.save();
 
       // Join rooms/groups.
       var groups = instance.get('groups')
@@ -139,10 +143,10 @@ sio.on('connection', function(socket) {
     });
 
     // Handle errors.
-    instance.on('error', function(data)) {
+    instance.on('error', function(data) {
       // @todo: better error handling.
-      throw error(data.code + ': ' data.msg);
-    }
+      throw new Error(data.code + ': ' + data.message);
+    });
   });
 
   /**
@@ -179,8 +183,8 @@ app.post('/login', function(req, res) {
  *************/
 var routes_backend = require('./routes/backend');
 
-app.post('/push/screens', routes_backend.screenPush);
-app.post('/push/reload', routes_backend.screenReload);
+app.post('/screen/update', routes_backend.screenUpdate);
+app.post('/screen/reload', routes_backend.screenReload);
 
 /************************************
  * Client API
