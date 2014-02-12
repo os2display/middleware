@@ -121,8 +121,7 @@ sio.on('connection', function(socket) {
     // Create new screen object.
     var instance = new Screen(data.token);
 
-    // Load screen which may trick a call to the backend.
-    instance.load();
+    // Actions when screen have been loaded.
     instance.on('loaded', function(data) {
       // Store socket id.
       instance.set('socketID', socket.id);
