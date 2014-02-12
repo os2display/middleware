@@ -6,21 +6,17 @@
 // Load token library.
 var jwt = require('jsonwebtoken');
 
-// Load configuration.
-var config = require('nconf');
-config.file({ file: 'config.json' });
-
 /**
  * Index page (/).
  */
-exports.index = function (req, res) {  
-  res.render('index', { sitename: config.get('sitename') });
+exports.index = function (req, res) {
+  res.render('index', { sitename: global.config.get('sitename') });
 };
 
 /**
  * Login callback (/login)
  *
- * The maintenance login page, used to get token an socket auth 
+ * The maintenance login page, used to get token an socket auth
  * token. Which can be used to pull proxy status information.
  */
 exports.login = function (req, res, jwt, jwt_secret) {
@@ -29,7 +25,7 @@ exports.login = function (req, res, jwt, jwt_secret) {
     password: req.body.password
   };
 
-  var maintenance = config.get('maintenance')
+  var maintenance = global.config.get('maintenance')
   if (profile.username === maintenance.username && profile.password === maintenance.password) {
     // We are sending the profile inside the token
     var token = jwt.sign(profile, jwt_secret, { expiresInMinutes: 60*24*365 });

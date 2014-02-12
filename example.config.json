@@ -19,5 +19,8 @@
     "host": "localhost",
     "auth": null
   },
-  "backends": [ "127.0.0.1" ]
+  "backend": {
+    "host": "127.0.0.1",
+    "post": "80"
+  }
 }

@@ -16,6 +16,7 @@ var app = express();
 
 // Load configuration.
 config.file({ file: 'config.json' });
+global.config = config;
 
 // As the server proxies (nginx) the web-socket and socket.io.js
 // request. This trick is used to make the local instances work.
