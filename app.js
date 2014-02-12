@@ -137,6 +137,12 @@ sio.on('connection', function(socket) {
 
       // @todo: Push content, if any exists.
     });
+
+    // Handle errors.
+    instance.on('error', function(data)) {
+      // @todo: better error handling.
+      throw error(data.code + ': ' data.msg);
+    }
   });
 
   /**
