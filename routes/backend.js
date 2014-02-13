@@ -63,6 +63,7 @@ exports.screenReload = function (req, res) {
       });
 
       instance.on('error', function(data) {
+        // @todo send result back.
         console.log(screens[screenID] + ': ' + data.code + ' - ' + data.message);
       });
     }
@@ -83,6 +84,31 @@ exports.screenReload = function (req, res) {
   }
   else {
     res.send(500);
+  }
+}
+
+/**
+ * Implements screen delete.
+ *
+ * Removes the screen form local cache (forced reload from backend).
+ */
+exports.screenRemove = function (req, res) {
+  if (req.body.token !== undefined) {
+    var Screen = require('../lib/screen');
+    var instance = new Screen(req.body.token);
+    instance.remove();
+
+    // Screen have been removed.
+    instance.on('removed', function() {
+      res.send(200);
+    });
+
+    // Handle errors in screen remove.
+    instance.on('error', function(data) {
+      // @todo send result back.
+      res.send(data.code);
+      return;
+    });
   }
 }
 

@@ -137,7 +137,7 @@ sio.on('connection', function(socket) {
       }
 
       // Send a 200 ready code back to the client.
-      socket.emit('ready', { statusCode: 200 })
+      socket.emit('ready', { statusCode: 200 });
 
       // @todo: Push content, if any exists.
     });
@@ -146,9 +146,14 @@ sio.on('connection', function(socket) {
     instance.on('error', function(data) {
 
       // If screen is not known any more dis-connect.
-
-      // @todo: better error handling.
-      throw new Error(data.code + ': ' + data.message);
+      if (data.code === 404) {
+        socket.emit('ready', { statusCode: 404 });
+        socket.disconnect('unauthorized');
+      }
+      else {
+        // @todo: better error handling.
+        throw new Error(data.code + ': ' + data.message);
+      }
     });
   });
 
@@ -166,7 +171,7 @@ sio.on('connection', function(socket) {
     }
 
     // Send feedback to the client.
-    socket.emit('pause', { statusCode: 200 })
+    socket.emit('pause', { statusCode: 200 });
   });
 });
 
@@ -188,6 +193,7 @@ var routes_backend = require('./routes/backend');
 
 app.post('/screen/update', routes_backend.screenUpdate);
 app.post('/screen/reload', routes_backend.screenReload);
+app.post('/screen/remove', routes_backend.screenRemove);
 app.post('/push/channel', routes_backend.pushChannel);
 app.post('/push/emergency', routes_backend.pushEmergency);
 app.post('/status', routes_backend.status);

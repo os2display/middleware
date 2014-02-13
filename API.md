@@ -106,7 +106,7 @@ Updated screen with new configuration information. This can only be used after a
 
 Sends signale to the screen to reload the front-end application. Can be used to force reload the application's content and thereby reset connections with the server. The parameters is optional, meaning that either arrays or one of the arrays can be given.
 
-#### /screen/delete
+#### /screen/remove
 
  * Parameters: { token: "" }
  * Method: POST
@@ -211,7 +211,6 @@ Should mostly be used when the screen is being utilised for other purposes or is
 ### API
 
 
-
 #### ready
 
  * Parameters: { statusCode: '' }
@@ -219,7 +218,7 @@ Should mostly be used when the screen is being utilised for other purposes or is
  * Return: None
  * Status: __Implemented__
 
-_Optional_: Used to acknowledge that the command have been received by the server.
+Acknowledgement that the command have been received by the server. The status code maybe "404" screen not found and the connection will be closed form the server side.
 
 #### pause
 
