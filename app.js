@@ -144,6 +144,9 @@ sio.on('connection', function(socket) {
 
     // Handle errors.
     instance.on('error', function(data) {
+
+      // If screen is not known any more dis-connect.
+
       // @todo: better error handling.
       throw new Error(data.code + ': ' + data.message);
     });

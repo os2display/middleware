@@ -9,26 +9,33 @@ var jwt = require('jsonwebtoken');
 /**
  * Checks that the activation code given is valided.
  *
- * If the code is valided an sign token is returned that can be 
+ * If the code is valided an sign token is returned that can be
  * used to establish the socket connection.
  */
 exports.activate = function (req, res, jwt, jwt_secret) {
   var activationCode = req.body.activationCode;
 
   if (activationCode != undefined) {
+    // Create token.
+    var token = jwt.sign(activationCode, jwt_secret);
 
-    // @todo: send request to backend about activation code and token.
-    if (activationCode == '12345') {
-      
-      // @todo: store screen information from the backend.
-      // @todo: Sign screen information NOT activation code.
-      var token = jwt.sign(activationCode, jwt_secret);
-      res.json({token: token});
-    }
-    else {
-      // Activation code not accepted.
-      res.send(403);
-    }
+    // Call backend to get screen information.
+    var Request = require('../lib/request');
+    var request= new Request();
+    request.send('/api/screen/activate', {
+      activationCode: activationCode,
+      token: token
+    });
+
+    request.on('completed', function(data) {
+      // Send valided token to the frontend.
+      res.json({ token: token });
+    });
+
+    request.on('error', function(data) {
+      // Error in the request send http code.
+      res.send(data.statusCode);
+    });
   }
   else {
     // @todo: Send better error code.

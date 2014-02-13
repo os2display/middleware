@@ -22,7 +22,7 @@ This is the backend API, which mainly is used by the frontend (proxy) to pull co
 
  * Parameters: { activationCode: '', token: '' }
  * Method: POST
- * Return: JSON { statusCode: '', id: '', name: '', groups: [] }
+ * Return: HTTP status code
  * Status: __Implemented__
 
 Activate a screen in the backend with the provided on-time activation code and a security token (SHA256) that identifies the screen. If the code is accepted a "200" Success status code and the backend ID for the screen is returned. If not accepted a "403" Forbidden code is returned.

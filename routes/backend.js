@@ -3,6 +3,13 @@
  * Defines the reset API routes used by the back-end.
  */
 
+/**
+ * Helper function to check the backend request only comes from the backend.
+ */
+function accessCheck(req) {
+  console.log(req);
+}
+
 exports.screenUpdate = function (req, res) {
   if (req.body.token !== undefined) {
     var Screen = require('../lib/screen')
@@ -39,6 +46,8 @@ exports.screenUpdate = function (req, res) {
  * Loads the screen based on screenID and sends reload command.
  */
 exports.screenReload = function (req, res) {
+  accessCheck(req);
+
   // Reload base on screens.
   if (req.body.screens !== undefined) {
     // Get screen class.
