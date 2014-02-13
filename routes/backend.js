@@ -94,22 +94,26 @@ exports.screenReload = function (req, res) {
  */
 exports.screenRemove = function (req, res) {
   if (req.body.token !== undefined) {
+    // Load the screen and remove it.
     var Screen = require('../lib/screen');
     var instance = new Screen(req.body.token);
     instance.remove();
 
-    // Screen have been removed.
+    // Screen has been removed.
     instance.on('removed', function() {
       res.send(200);
+      return;
     });
 
-    // Handle errors in screen remove.
+    // Handle errors in screen removale.
     instance.on('error', function(data) {
       // @todo send result back.
       res.send(data.code);
       return;
     });
   }
+
+  res.send(500);
 }
 
 /**
