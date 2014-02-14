@@ -7,16 +7,27 @@
  * Helper function to check the backend request only comes from the backend.
  */
 function accessCheck(req) {
-  console.log(req);
+  if (global.config.get('backend').ip === req.ip) {
+    return true;
+  }
+  return false;
 }
 
+/**
+ * Update screen information.
+ */
 exports.screenUpdate = function (req, res) {
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
+
   if (req.body.token !== undefined) {
     var Screen = require('../lib/screen')
     var instance = new Screen(req.body.token);
     instance.on('loaded', function() {
-      instance.set('name', req.body.screenName);
-      instance.set('screenGroups', req.body.screenGroups);
+      instance.set('name', req.body.name);
+      instance.set('screenGroups', req.body.groups);
 
       // Save the updates.
       instance.save();
@@ -46,7 +57,10 @@ exports.screenUpdate = function (req, res) {
  * Loads the screen based on screenID and sends reload command.
  */
 exports.screenReload = function (req, res) {
-  accessCheck(req);
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
 
   // Reload base on screens.
   if (req.body.screens !== undefined) {
@@ -93,6 +107,11 @@ exports.screenReload = function (req, res) {
  * Removes the screen form local cache (forced reload from backend).
  */
 exports.screenRemove = function (req, res) {
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
+
   if (req.body.token !== undefined) {
     // Load the screen and remove it.
     var Screen = require('../lib/screen');
@@ -116,6 +135,11 @@ exports.screenRemove = function (req, res) {
  * Implements push channel content.
  */
 exports.pushChannel = function (req, res) {
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
+
   if (req.body.channelID !== undefined) {
     // Create new channel object.
     var Channel = require('../lib/channel');
@@ -149,6 +173,11 @@ exports.pushChannel = function (req, res) {
  * Implements emergency content push.
  */
 exports.pushEmergency = function (req, res) {
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
+
   res.send(501);
 }
 
@@ -156,5 +185,10 @@ exports.pushEmergency = function (req, res) {
  * Implements status request.
  */
 exports.status = function (req, res) {
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
+
   res.send(501);
 }
