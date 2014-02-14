@@ -117,12 +117,12 @@ Removes a screen form the local redis server. Thereby forcing the backend to be 
 
 #### /push/channel
 
- * Parameters: { channelID : '', content: {}, groups: [ groupID, ..... ] }
+ * Parameters: { channelID : '', channelContent: {}, groups: [ groupID, ..... ] }
  * Method: POST
  * Return: HTTP Status code
  * Status: __interface ready__
 
-Content JSON:
+channelContent JSON:
 <pre>
 {
   logo: '',

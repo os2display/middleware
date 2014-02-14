@@ -102,25 +102,47 @@ exports.screenRemove = function (req, res) {
     // Screen has been removed.
     instance.on('removed', function() {
       res.send(200);
-      return;
     });
 
     // Handle errors in screen removale.
     instance.on('error', function(data) {
       // @todo send result back.
       res.send(data.code);
-      return;
     });
   }
-
-  res.send(500);
 }
 
 /**
  * Implements push channel content.
  */
 exports.pushChannel = function (req, res) {
-  res.send(501);
+  if (req.body.channelID !== undefined) {
+    // Create new channel object.
+    var Channel = require('../lib/channel');
+    var instance = new Channel(req.body.channelID);
+
+    // Add content.
+    instance.set('content', req.body.channelContent);
+
+    // Add groups.
+    instance.set('groups', req.body.groups);
+
+    // Cache channel (save in redis).
+    instance.save();
+    instance.on('saved', function() {
+      // Save completed.
+      res.send(200);
+
+      // Push content to screens.
+      instance.push();
+    });
+
+    // Handle error events.
+    instance.on('error', function(data) {
+      console.log(data.code + ': ' + data.message);
+      res.send(500);
+    });
+  }
 }
 
 /**
