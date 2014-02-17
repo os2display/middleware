@@ -121,6 +121,7 @@ sio.on('connection', function(socket) {
   socket.on('ready', function(data) {
     // Create new screen object.
     var instance = new Screen(data.token);
+    instance.load();
 
     // Actions when screen have been loaded.
     instance.on('loaded', function(data) {

@@ -25,6 +25,7 @@ exports.screenUpdate = function (req, res) {
   if (req.body.token !== undefined) {
     var Screen = require('../lib/screen')
     var instance = new Screen(req.body.token);
+    instance.load();
     instance.on('loaded', function() {
       instance.set('name', req.body.name);
       instance.set('screenGroups', req.body.groups);
@@ -72,6 +73,7 @@ exports.screenReload = function (req, res) {
       console.log(screens[screenID]);
       // Create new screen object.
       var instance = new Screen(undefined, screens[screenID]);
+      instance.load();
       instance.on('loaded', function(data) {
         instance.reload();
       });
@@ -116,7 +118,12 @@ exports.screenRemove = function (req, res) {
     // Load the screen and remove it.
     var Screen = require('../lib/screen');
     var instance = new Screen(req.body.token);
-    instance.remove();
+
+    // Load it before removeing it to get socket connection.
+    instance.load();
+    instance.on('loaded', function() {
+      instance.remove();
+    });
 
     // Screen has been removed.
     instance.on('removed', function() {
@@ -166,6 +173,9 @@ exports.pushChannel = function (req, res) {
       console.log(data.code + ': ' + data.message);
       res.send(500);
     });
+  }
+  else {
+    res.send(500);
   }
 }
 
