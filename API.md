@@ -139,7 +139,9 @@ channelContent JSON:
   	  subheadline: '',
   	  text: '',
   	  exposure: '',
-  	  layout: '',
+      layout: '',
+      publish: '',
+      unpublish: ''
   	}, ....
   ]
 }
@@ -151,6 +153,13 @@ channelContent JSON:
  * Method: POST
  * Return: HTTP Status code
  * Status: __interface ready__
+
+#### /channel/remove
+
+ * Parameters: { channelID: '' }
+ * Method: POST
+ * Return: HTTP Status code
+ * Status: __not ready__
 
 #### /status
 
