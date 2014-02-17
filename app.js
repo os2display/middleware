@@ -139,7 +139,8 @@ sio.on('connection', function(socket) {
       // Send a 200 ready code back to the client.
       socket.emit('ready', { statusCode: 200 });
 
-      // @todo: Push content, if any exists.
+      // Push channels to the screen, if any channels exists.
+      instance.push();
     });
 
     // Handle errors.
