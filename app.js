@@ -146,15 +146,11 @@ sio.on('connection', function(socket) {
 
     // Handle errors.
     instance.on('error', function(data) {
-
+      // All errors are automatically logged in Base class.
       // If screen is not known any more dis-connect.
       if (data.code === 404) {
         socket.emit('ready', { statusCode: 404 });
         socket.disconnect('unauthorized');
-      }
-      else {
-        // @todo: better error handling.
-        throw new Error(data.code + ': ' + data.message);
       }
     });
   });
