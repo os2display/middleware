@@ -128,7 +128,7 @@ sio.on('connection', function(socket) {
       instance.save();
 
       // Join rooms/groups.
-      var groups = instance.get('groups')
+      var groups = instance.get('groups');
       for (var i in groups) {
         socket.join(groups[i]);
       }
