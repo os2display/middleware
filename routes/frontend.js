@@ -38,6 +38,8 @@ exports.activate = function (req, res, jwt, jwt_secret) {
     });
   }
   else {
+    var logger = new Log('info', fs.createWriteStream(config.get('log'), {'flags': 'a'}));
+    logger.error('Activation code was not found.');
     // @todo: Send better error code.
     res.send(500);
   }
