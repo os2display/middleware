@@ -18,6 +18,10 @@ var app = express();
 config.file({ file: 'config.json' });
 global.config = config;
 
+// Add logger.
+var Log = require('log')
+var logger = new Log('info', fs.createWriteStream(config.get('log'), {'flags': 'a'}));
+
 // As the server proxies (nginx) the web-socket and socket.io.js
 // request. This trick is used to make the local instances work.
 var http = undefined;
@@ -145,7 +149,8 @@ sio.on('connection', function(socket) {
       // All errors are automatically logged in Base class.
       // If screen is not known any more dis-connect.
       if (data.code === 404) {
-        socket.emit('ready', { statusCode: 404 });
+        logger.info('Screen have been disconnected.');
+        socket.emit('booted', { statusCode: 404 });
         socket.disconnect('unauthorized');
       }
     });
