@@ -44,7 +44,7 @@ else {
 }
 
 // Add socket.io to the mix.
-var sio = require('socket.io').listen(server);
+var sio = require('socket.io')(server);
 global.sio = sio;
 
 // Token based auth.
@@ -59,8 +59,6 @@ if (config.get('debug') === false) {
   sio.enable('browser client gzip');
 }
 
-// Set socket.io log level (in production it should be 1).
-sio.set('log level', config.get('log_level'));
 
 // Set express app configuration.
 app.set('port', config.get('port'));
@@ -77,7 +75,7 @@ if (config.get('debug')) {
 };
 
 // Start the server.
-server.listen(app.get('port'), function(){
+server.listen(app.get('port'), function (){
   if (config.get('debug')) {
     console.log('Express server with socket.io is listening on port ' + app.get('port'));
   }
@@ -97,12 +95,10 @@ redisClient.on("connect", function (err) {
 });
 
 // Ensure that the JWT is used to authenticate socket.io connections.
-sio.configure(function (){
-  sio.set('authorization', socketio_jwt.authorize({
-    secret: jwt_secret,
-  	handshake: true
-  }))
-});
+sio.set('authorization', socketio_jwt.authorize({
+  secret: jwt_secret,
+	handshake: true
+}));
 
 /************************************
  * Load application objects
@@ -118,13 +114,13 @@ sio.on('connection', function(socket) {
   /**
    * Ready event.
    */
-  socket.on('ready', function(data) {
+  socket.on('ready', function (data) {
     // Create new screen object.
     var instance = new Screen(data.token);
     instance.load();
 
     // Actions when screen have been loaded.
-    instance.on('loaded', function(data) {
+    instance.on('loaded', function (data) {
       // Store socket id.
       instance.set('socketID', socket.id);
 
@@ -132,7 +128,7 @@ sio.on('connection', function(socket) {
       instance.save();
 
       // Join rooms/groups.
-      var groups = instance.get('groups')
+      var groups = instance.get('groups');
       for (var i in groups) {
         socket.join(groups[i]);
       }
@@ -145,7 +141,7 @@ sio.on('connection', function(socket) {
     });
 
     // Handle errors.
-    instance.on('error', function(data) {
+    instance.on('error', function (data) {
       // All errors are automatically logged in Base class.
       // If screen is not known any more dis-connect.
       if (data.code === 404) {
@@ -158,7 +154,7 @@ sio.on('connection', function(socket) {
   /**
    * Pause event.
    */
-  socket.on('pause', function(data) {
+  socket.on('pause', function (data) {
     // Get a list of rooms that this socket is in.
     var rooms = sio.sockets.manager.roomClients[socket.id];
 
@@ -201,6 +197,6 @@ app.post('/status', routes_backend.status);
  ************/
 var routes_frontend = require('./routes/frontend');
 
-app.post('/activate', function(req, res) {
+app.post('/activate', function (req, res) {
   routes_frontend.activate(req, res, jwt, jwt_secret);
 });

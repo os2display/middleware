@@ -5,11 +5,11 @@
   "private": true,
   "dependencies": {
     "express" : "3.4.x",
-    "socket.io" : "0.9.x",
+    "socket.io" : "1.0.x",
     "redis" : "0.10.x",
     "hjs" : "0.0.6",
-    "jsonwebtoken" : "0.1.0",
-    "socketio-jwt" : "2.0.1",
+    "jsonwebtoken" : "0.4.0",
+    "socketio-jwt" : "2.3.1",
     "nconf" : "0.6.9",
     "log" : "1.4.0",
     "optimist" : "0.6.0"
