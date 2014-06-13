@@ -95,12 +95,10 @@ redisClient.on("connect", function (err) {
 });
 
 // Ensure that the JWT is used to authenticate socket.io connections.
-sio.configure(function (){
-  sio.set('authorization', socketio_jwt.authorize({
-    secret: jwt_secret,
-  	handshake: true
-  }))
-});
+sio.set('authorization', socketio_jwt.authorize({
+  secret: jwt_secret,
+	handshake: true
+}));
 
 /************************************
  * Load application objects
