@@ -47,10 +47,9 @@ else {
   server = http.createServer(app);
 }
 
-
 // Add socket.io to the mix.
-var connection = require('./lib/connection');
-connection.init(server, config.get('debug'), config.get('secret'));
+var Connection = require('./lib/connection');
+var con = new Connection(server, config.get('debug'), config.get('secret'));
 
 // Set express app configuration.
 app.set('port', config.get('port'));
@@ -86,51 +85,32 @@ redisClient.on("connect", function (err) {
   }
 });
 
-// Ensure that the JWT is used to authenticate socket.io connections.
-// Token based auth.
-var socketio_jwt = require('socketio-jwt');
-
-
-sio.set('authorization', socketio_jwt.authorize({
-  secret: config.get('secret'),
-	handshake: true
-}));
-
 /************************************
  * Load application objects
  **************************/
-var rooms = [];
-var Screen = require('./lib/screen');
+var screens = require('./lib/screens');
 
 /************************************
  * Socket events
  ***************/
-sio.on('connection', function(socket) {
+con.on('connection', function(client) {
 
   /**
    * Ready event.
    */
-  socket.on('ready', function (data) {
-    // Create new screen object.
-    var instance = new Screen(data.token);
+  client.on('ready', function (data) {
+    // Create new screen object. @todo move into screens.
+    var instance = screens.createScreen(data.token, client);
     instance.load();
 
     // Actions when screen have been loaded.
     instance.on('loaded', function (data) {
-      // Store socket id.
-      instance.set('socketID', socket.id);
-
-      // The screen have been updated with socket ID, so save it.
-      instance.save();
-
       // Join rooms/groups.
       var groups = instance.get('groups');
-      for (var i in groups) {
-        socket.join(groups[i]);
-      }
+      client.join(groups);
 
       // Send a 200 ready code back to the client.
-      socket.emit('ready', { statusCode: 200 });
+      client.ready(200);
 
       // Push channels to the screen, if any channels exists.
       instance.push();
@@ -139,30 +119,27 @@ sio.on('connection', function(socket) {
     // Handle errors.
     instance.on('error', function (data) {
       // All errors are automatically logged in Base class.
-      // If screen is not known any more dis-connect.
       if (data.code === 404) {
-        logger.info('Screen have been disconnected.');
-        socket.emit('booted', { statusCode: 404 });
-        socket.disconnect('unauthorized');
+        // If screen is not known any more dis-connect.
+        client.kick(data.code);
       }
     });
+  });
+
+  // If client disconnects remove the screen from the active list.
+  client.on('disconnect', function(data) {
+    screens.removeScreen(client.getToken());
   });
 
   /**
    * Pause event.
    */
-  socket.on('pause', function (data) {
-    // Get a list of rooms that this socket is in.
-    var rooms = sio.sockets.manager.roomClients[socket.id];
-
-    // Remove the socket from the rooms.
-    for (var room in rooms) {
-      room = room.substring(1);
-      socket.leave(room);
-    }
+  client.on('pause', function (data) {
+    // Remove the client from the rooms/groups.
+    client.leaveRooms();
 
     // Send feedback to the client.
-    socket.emit('pause', { statusCode: 200 });
+    client.pause(200);
   });
 });
 

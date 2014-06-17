@@ -99,12 +99,12 @@ Updated screen with new configuration information. This can only be used after a
 
 #### /screen/reload
 
- * Parameters: { screens: [ screenID, ..... ], groups: [ groupID, ..... ] }
+ * Parameters: { screens: [ token, ..... ], groups: [ groupID, ..... ] }
  * Method: POST
  * Return: HTTP Status code
  * Status: __Implemented__
 
-Sends signale to the screen to reload the front-end application. Can be used to force reload the application's content and thereby reset connections with the server. The parameters is optional, meaning that either arrays or one of the arrays can be given.
+Sends signal to the screen to reload the front-end application. Can be used to force reload the application's content and thereby reset connections with the server. The parameters is optional, meaning that either arrays or one of the arrays can be given.
 
 #### /screen/remove
 
@@ -113,7 +113,7 @@ Sends signale to the screen to reload the front-end application. Can be used to 
  * Return: HTTP Status code
  * Status: __Implemented__
 
-Removes a screen form the local redis server. Thereby forcing the backend to be asked about the screens existens on web-socket connection.
+Removes a screen form the local Redis server. Thereby forcing the backend to be asked about the screens existents on web-socket connection.
 
 #### /push/channel
 
