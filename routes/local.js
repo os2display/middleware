@@ -19,7 +19,7 @@ exports.index = function (req, res) {
  * The maintenance login page, used to get token an socket auth
  * token. Which can be used to pull proxy status information.
  */
-exports.login = function (req, res, jwt, jwt_secret) {
+exports.login = function (req, res, jwt_secret) {
   var profile = {
     username: req.body.username,
     password: req.body.password

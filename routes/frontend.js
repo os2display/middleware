@@ -12,7 +12,7 @@ var jwt = require('jsonwebtoken');
  * If the code is valided an sign token is returned that can be
  * used to establish the socket connection.
  */
-exports.activate = function (req, res, jwt, jwt_secret) {
+exports.activate = function (req, res, jwt_secret) {
   var activationCode = req.body.activationCode;
 
   if (activationCode != undefined) {

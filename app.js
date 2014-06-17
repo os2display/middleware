@@ -47,22 +47,10 @@ else {
   server = http.createServer(app);
 }
 
+
 // Add socket.io to the mix.
-var sio = require('socket.io')(server);
-global.sio = sio;
-
-// Token based auth.
-var socketio_jwt = require('socketio-jwt');
-var jwt = require('jsonwebtoken');
-var jwt_secret = config.get('secret');
-
-// Set socket.io client configuration.
-if (config.get('debug') === false) {
-  sio.enable('browser client minification');
-  sio.enable('browser client etag');
-  sio.enable('browser client gzip');
-}
-
+var connection = require('./lib/connection');
+connection.init(server, config.get('debug'), config.get('secret'));
 
 // Set express app configuration.
 app.set('port', config.get('port'));
@@ -99,8 +87,12 @@ redisClient.on("connect", function (err) {
 });
 
 // Ensure that the JWT is used to authenticate socket.io connections.
+// Token based auth.
+var socketio_jwt = require('socketio-jwt');
+
+
 sio.set('authorization', socketio_jwt.authorize({
-  secret: jwt_secret,
+  secret: config.get('secret'),
 	handshake: true
 }));
 
@@ -182,7 +174,7 @@ var routes = require('./routes/local');
 app.get('/', routes.index);
 
 app.post('/login', function(req, res) {
-	routes.login(req, res, jwt, jwt_secret);
+	routes.login(req, res, config.get('secret'));
 });
 
 /************************************
@@ -203,5 +195,5 @@ app.post('/status', routes_backend.status);
 var routes_frontend = require('./routes/frontend');
 
 app.post('/activate', function (req, res) {
-  routes_frontend.activate(req, res, jwt, jwt_secret);
+  routes_frontend.activate(req, res, config.get('secret'));
 });
