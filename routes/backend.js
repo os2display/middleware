@@ -66,17 +66,17 @@ exports.screenReload = function (req, res) {
   // Reload base on screens.
   if (req.body.screens !== undefined) {
     // Get screen class.
-    var Screen = require('../lib/screen');
+    var screens = require('../lib/screens');
 
-    var screens = req.body.screens;
-    for (var screenID in req.body.screens) {
-      console.log(screens[screenID]);
-      // Create new screen object.
-      var instance = new Screen(undefined, screens[screenID]);
-      instance.load();
-      instance.on('loaded', function(data) {
+    var len = req.body.screens.length;
+    for (var i = 0; i < len; i++) {
+      var token = req.body.screens[i];
+
+      // Get screen.
+      var instance = screens.get(token);
+      if (instance) {
         instance.reload();
-      });
+      }
 
       instance.on('error', function(data) {
         // @todo send result back.
