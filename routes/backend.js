@@ -93,6 +93,7 @@ exports.screenReload = function (req, res) {
 
     var groups = req.body.groups;
     for (var groupsID in groups) {
+      // @todo: reload base on group.
       sio.sockets.in(groups[groupsID]).emit('reload', {});
     }
 
@@ -116,14 +117,25 @@ exports.screenRemove = function (req, res) {
 
   if (req.body.token !== undefined) {
     // Load the screen and remove it.
-    var Screen = require('../lib/screen');
-    var instance = new Screen(req.body.token);
+    var screens = require('../lib/screens');
+    var token = req.body.token;
 
-    // Load it before removeing it to get socket connection.
-    instance.load();
-    instance.on('loaded', function() {
+    var instance = screens.get(token);
+    if (instance === undefined) {
+      // Screen may exists in cache even if it not active.
+      var Screen = require('../lib/screen');
+      instance = new Screen(token);
+
+      // Load it before removeing it to get socket connection.
+      instance.load();
+      instance.on('loaded', function() {
+        instance.remove();
+      });
+    }
+    else {
+      // Active screen remove it.
       instance.remove();
-    });
+    }
 
     // Screen has been removed.
     instance.on('removed', function() {
@@ -170,7 +182,6 @@ exports.pushChannel = function (req, res) {
 
     // Handle error events.
     instance.on('error', function(data) {
-      console.log(data.code + ': ' + data.message);
       res.send(500);
     });
   }
