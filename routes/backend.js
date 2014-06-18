@@ -88,14 +88,9 @@ exports.screenReload = function (req, res) {
   }
   // Reload based on groups.
   else if (req.body.groups !== undefined) {
-    // Get sockets.
-    var sio = global.sio;
-
     var groups = req.body.groups;
-    for (var groupsID in groups) {
-      // @todo: reload base on group.
-      sio.sockets.in(groups[groupsID]).emit('reload', {});
-    }
+    var connection = require('./lib/connection');
+    connection.boardcast(groups, 'reload', {});
 
     res.send(200);
   }

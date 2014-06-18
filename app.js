@@ -48,8 +48,8 @@ else {
 }
 
 // Add socket.io to the mix.
-var Connection = require('./lib/connection');
-var con = new Connection(server, config.get('debug'), config.get('secret'));
+var connection = require('./lib/connection');
+connection.connect(server, config.get('debug'), config.get('secret'));
 
 // Set express app configuration.
 app.set('port', config.get('port'));
@@ -93,7 +93,7 @@ var screens = require('./lib/screens');
 /************************************
  * Socket events
  ***************/
-con.on('connection', function(client) {
+connection.on('connection', function(client) {
 
   /**
    * Ready event.
@@ -135,8 +135,12 @@ con.on('connection', function(client) {
    * Pause event.
    */
   client.on('pause', function (data) {
+    // Get client groups.
+    var instance = screens.get(client.getToken());
+    var groups = instance.get('groups');
+
     // Remove the client from the rooms/groups.
-    client.leaveRooms();
+    client.leave(groups);
 
     // Send feedback to the client.
     client.pause(200);
