@@ -92,6 +92,8 @@ var screens = require('./lib/screens');
 
 /************************************
  * Socket events
+ *
+ * @todo: This may be able to be moved inside the objects.
  ***************/
 connection.on('connection', function(client) {
 
