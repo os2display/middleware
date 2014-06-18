@@ -9,12 +9,12 @@
 var path = require('path');
 var express = require('express');
 var fs = require('fs');
-var config = require('nconf');
 
 // Start the app.
 var app = express();
 
 // Load configuration.
+var config = require('nconf');
 config.file({ file: 'config.json' });
 global.config = config;
 
@@ -69,19 +69,6 @@ if (config.get('debug')) {
 server.listen(app.get('port'), function (){
   if (config.get('debug')) {
     console.log('Express server with socket.io is listening on port ' + app.get('port'));
-  }
-});
-
-// Connect to redis server.
-var redis = require("redis");
-var rconf = config.get('redis')
-global.redisClient = redis.createClient(rconf.port, rconf.host, { 'auth_pass': rconf.auth });
-redisClient.on('error', function (err) {
-  console.log(err);
-});
-redisClient.on("connect", function (err) {
-  if (config.get('debug')) {
-    console.log('Connected to redis server at: ' + rconf.host);
   }
 });
 
