@@ -7,7 +7,9 @@
  * Helper function to check the backend request only comes from the backend.
  */
 function accessCheck(req) {
-  if (global.config.get('backend').ip === req.ip) {
+  var config = require('nconf');
+  config.file({ file: 'config.json' });
+  if (config.get('backend').ip === req.ip) {
     return true;
   }
   return false;

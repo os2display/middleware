@@ -16,7 +16,6 @@ var app = express();
 // Load configuration.
 var config = require('nconf');
 config.file({ file: 'config.json' });
-global.config = config;
 
 // Add logger.
 var Log = require('log')
