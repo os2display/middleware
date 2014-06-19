@@ -163,10 +163,12 @@ channelContent JSON:
 
 #### /status
 
- * Parameters: { screens: [] }
+ * Parameters: { screens: [ token, ... ] }
  * Method: POST
- * Return: HTTP Status code
- * Status: __interface ready__
+ * Return: JSON
+ * Status: __Implemented__
+ 
+Returns JSON array index by tokens with timestamps of last heartbeat from the screen.
 
 
 
