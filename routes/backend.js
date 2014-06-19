@@ -203,13 +203,13 @@ exports.pushEmergency = function (req, res) {
  * Implements status request.
  */
 exports.status = function (req, res) {
-  // if (!accessCheck(req)) {
-  //   res.send(403);
-  //   return;
-  // };
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
 
   // Check parameter exists.
-  if (req.body.tokens !== undefined) {
+  if (req.body.screens !== undefined) {
     // Load configuration.
     var config = require('nconf');
     config.file({ file: 'config.json' });
@@ -218,32 +218,27 @@ exports.status = function (req, res) {
     var rediesConf = config.get('redis')
     var redis = require("redis").createClient(rediesConf.port, rediesConf.host, { 'auth_pass': rediesConf.auth });
     redis.on('error', function (err) {
-      console.log(err);
-      res.send(501);
+      res.send(500);
     });
     redis.on("connect", function (status) {
       var status = {};
-      var len = req.body.tokens.length;
+      var tokens = req.body.screens;
+      var len = tokens.length;
 
-      // Loop over tokens and get status.
-      for (var i = 0; i < len; i++) {
-        var token = req.body.tokens[i];
-        redis.get('screen:heartbeat:' + token, function(err, data) {
-          if (err) {
-            res.send(501);
-          }
+      redis.hmget('screen:heartbeats', tokens, function(err, data) {
+        if (err) {
+          res.send(501);
+        }
 
-          if (data != null) {
-            status[token] = data;
-          }
+        // Link tokens and timestamps.
+        var status = {};
+        for (var i = 0; i < len; i++) {
+          status[tokens[i]] = data[i];
+        }
 
-          //
-          if (i == len) {
-            // Return status as object (JSON).
-            res.send(status);
-          }
-        });
-      }
+        // Send them back.
+        res.send(status);
+      });
     });
   }
   else {
