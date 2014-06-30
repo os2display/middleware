@@ -221,7 +221,7 @@ exports.status = function (req, res) {
       res.send(500);
     });
     redis.on("connect", function (status) {
-      redis.redis.select(rediesConf.db, function() {
+      redis.select(rediesConf.db, function() {
         var status = {};
         var tokens = req.body.screens;
         var len = tokens.length;
