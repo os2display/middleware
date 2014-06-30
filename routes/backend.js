@@ -221,23 +221,25 @@ exports.status = function (req, res) {
       res.send(500);
     });
     redis.on("connect", function (status) {
-      var status = {};
-      var tokens = req.body.screens;
-      var len = tokens.length;
-
-      redis.hmget('screen:heartbeats', tokens, function(err, data) {
-        if (err) {
-          res.send(501);
-        }
-
-        // Link tokens and timestamps.
+      self.redis.select(rediesConf.db, function() {
         var status = {};
-        for (var i = 0; i < len; i++) {
-          status[tokens[i]] = data[i];
-        }
+        var tokens = req.body.screens;
+        var len = tokens.length;
 
-        // Send them back.
-        res.send(status);
+        redis.hmget('screen:heartbeats', tokens, function(err, data) {
+          if (err) {
+            res.send(501);
+          }
+
+          // Link tokens and timestamps.
+          var status = {};
+          for (var i = 0; i < len; i++) {
+            status[tokens[i]] = data[i];
+          }
+
+          // Send them back.
+          res.send(status);
+        });
       });
     });
   }
