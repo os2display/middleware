@@ -9,14 +9,13 @@
 var path = require('path');
 var express = require('express');
 var fs = require('fs');
-var config = require('nconf');
 
 // Start the app.
 var app = express();
 
 // Load configuration.
+var config = require('nconf');
 config.file({ file: 'config.json' });
-global.config = config;
 
 // Add logger.
 var Log = require('log')
@@ -48,21 +47,8 @@ else {
 }
 
 // Add socket.io to the mix.
-var sio = require('socket.io')(server);
-global.sio = sio;
-
-// Token based auth.
-var socketio_jwt = require('socketio-jwt');
-var jwt = require('jsonwebtoken');
-var jwt_secret = config.get('secret');
-
-// Set socket.io client configuration.
-if (config.get('debug') === false) {
-  sio.enable('browser client minification');
-  sio.enable('browser client etag');
-  sio.enable('browser client gzip');
-}
-
+var connection = require('./lib/connection');
+connection.connect(server, config.get('debug'), config.get('secret'));
 
 // Set express app configuration.
 app.set('port', config.get('port'));
@@ -85,60 +71,34 @@ server.listen(app.get('port'), function (){
   }
 });
 
-// Connect to redis server.
-var redis = require("redis");
-var rconf = config.get('redis')
-global.redisClient = redis.createClient(rconf.port, rconf.host, { 'auth_pass': rconf.auth });
-redisClient.on('error', function (err) {
-  console.log(err);
-});
-redisClient.on("connect", function (err) {
-  if (config.get('debug')) {
-    console.log('Connected to redis server at: ' + rconf.host);
-  }
-});
-
-// Ensure that the JWT is used to authenticate socket.io connections.
-sio.set('authorization', socketio_jwt.authorize({
-  secret: jwt_secret,
-	handshake: true
-}));
-
 /************************************
  * Load application objects
  **************************/
-var rooms = [];
-var Screen = require('./lib/screen');
+var screens = require('./lib/screens');
 
 /************************************
  * Socket events
+ *
+ * @todo: This may be able to be moved inside the objects.
  ***************/
-sio.on('connection', function(socket) {
+connection.on('connection', function(client) {
 
   /**
    * Ready event.
    */
-  socket.on('ready', function (data) {
-    // Create new screen object.
-    var instance = new Screen(data.token);
+  client.on('ready', function (data) {
+    // Create new screen object. @todo move into screens.
+    var instance = screens.createScreen(data.token, client);
     instance.load();
 
     // Actions when screen have been loaded.
     instance.on('loaded', function (data) {
-      // Store socket id.
-      instance.set('socketID', socket.id);
-
-      // The screen have been updated with socket ID, so save it.
-      instance.save();
-
       // Join rooms/groups.
       var groups = instance.get('groups');
-      for (var i in groups) {
-        socket.join(groups[i]);
-      }
+      client.join(groups);
 
       // Send a 200 ready code back to the client.
-      socket.emit('ready', { statusCode: 200 });
+      client.ready(200);
 
       // Push channels to the screen, if any channels exists.
       instance.push();
@@ -147,30 +107,31 @@ sio.on('connection', function(socket) {
     // Handle errors.
     instance.on('error', function (data) {
       // All errors are automatically logged in Base class.
-      // If screen is not known any more dis-connect.
       if (data.code === 404) {
-        logger.info('Screen have been disconnected.');
-        socket.emit('booted', { statusCode: 404 });
-        socket.disconnect('unauthorized');
+        // If screen is not known any more dis-connect.
+        client.kick(data.code);
       }
     });
+  });
+
+  // If client disconnects remove the screen from the active list.
+  client.on('disconnect', function(data) {
+    screens.removeScreen(client.getToken());
   });
 
   /**
    * Pause event.
    */
-  socket.on('pause', function (data) {
-    // Get a list of rooms that this socket is in.
-    var rooms = sio.sockets.manager.roomClients[socket.id];
+  client.on('pause', function (data) {
+    // Get client groups.
+    var instance = screens.get(client.getToken());
+    var groups = instance.get('groups');
 
-    // Remove the socket from the rooms.
-    for (var room in rooms) {
-      room = room.substring(1);
-      socket.leave(room);
-    }
+    // Remove the client from the rooms/groups.
+    client.leave(groups);
 
     // Send feedback to the client.
-    socket.emit('pause', { statusCode: 200 });
+    client.pause(200);
   });
 });
 
@@ -182,7 +143,7 @@ var routes = require('./routes/local');
 app.get('/', routes.index);
 
 app.post('/login', function(req, res) {
-	routes.login(req, res, jwt, jwt_secret);
+	routes.login(req, res, config.get('secret'));
 });
 
 /************************************
@@ -203,5 +164,5 @@ app.post('/status', routes_backend.status);
 var routes_frontend = require('./routes/frontend');
 
 app.post('/activate', function (req, res) {
-  routes_frontend.activate(req, res, jwt, jwt_secret);
+  routes_frontend.activate(req, res, config.get('secret'));
 });

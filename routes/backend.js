@@ -7,7 +7,9 @@
  * Helper function to check the backend request only comes from the backend.
  */
 function accessCheck(req) {
-  if (global.config.get('backend').ip === req.ip) {
+  var config = require('nconf');
+  config.file({ file: 'config.json' });
+  if (config.get('backend').ip === req.ip) {
     return true;
   }
   return false;
@@ -66,17 +68,17 @@ exports.screenReload = function (req, res) {
   // Reload base on screens.
   if (req.body.screens !== undefined) {
     // Get screen class.
-    var Screen = require('../lib/screen');
+    var screens = require('../lib/screens');
 
-    var screens = req.body.screens;
-    for (var screenID in req.body.screens) {
-      console.log(screens[screenID]);
-      // Create new screen object.
-      var instance = new Screen(undefined, screens[screenID]);
-      instance.load();
-      instance.on('loaded', function(data) {
+    var len = req.body.screens.length;
+    for (var i = 0; i < len; i++) {
+      var token = req.body.screens[i];
+
+      // Get screen.
+      var instance = screens.get(token);
+      if (instance) {
         instance.reload();
-      });
+      }
 
       instance.on('error', function(data) {
         // @todo send result back.
@@ -88,13 +90,9 @@ exports.screenReload = function (req, res) {
   }
   // Reload based on groups.
   else if (req.body.groups !== undefined) {
-    // Get sockets.
-    var sio = global.sio;
-
     var groups = req.body.groups;
-    for (var groupsID in groups) {
-      sio.sockets.in(groups[groupsID]).emit('reload', {});
-    }
+    var connection = require('./lib/connection');
+    connection.boardcast(groups, 'reload', {});
 
     res.send(200);
   }
@@ -116,14 +114,25 @@ exports.screenRemove = function (req, res) {
 
   if (req.body.token !== undefined) {
     // Load the screen and remove it.
-    var Screen = require('../lib/screen');
-    var instance = new Screen(req.body.token);
+    var screens = require('../lib/screens');
+    var token = req.body.token;
 
-    // Load it before removeing it to get socket connection.
-    instance.load();
-    instance.on('loaded', function() {
+    var instance = screens.get(token);
+    if (instance === undefined) {
+      // Screen may exists in cache even if it not active.
+      var Screen = require('../lib/screen');
+      instance = new Screen(token);
+
+      // Load it before removeing it to get socket connection.
+      instance.load();
+      instance.on('loaded', function() {
+        instance.remove();
+      });
+    }
+    else {
+      // Active screen remove it.
       instance.remove();
-    });
+    }
 
     // Screen has been removed.
     instance.on('removed', function() {
@@ -170,7 +179,6 @@ exports.pushChannel = function (req, res) {
 
     // Handle error events.
     instance.on('error', function(data) {
-      console.log(data.code + ': ' + data.message);
       res.send(500);
     });
   }
@@ -200,5 +208,42 @@ exports.status = function (req, res) {
     return;
   };
 
-  res.send(501);
+  // Check parameter exists.
+  if (req.body.screens !== undefined) {
+    // Load configuration.
+    var config = require('nconf');
+    config.file({ file: 'config.json' });
+
+    // Connect to redis server.
+    var rediesConf = config.get('redis')
+    var redis = require("redis").createClient(rediesConf.port, rediesConf.host, { 'auth_pass': rediesConf.auth });
+    redis.on('error', function (err) {
+      res.send(500);
+    });
+    redis.on("connect", function (status) {
+      redis.select(rediesConf.db, function() {
+        var status = {};
+        var tokens = req.body.screens;
+        var len = tokens.length;
+
+        redis.hmget('screen:heartbeats', tokens, function(err, data) {
+          if (err) {
+            res.send(501);
+          }
+
+          // Link tokens and timestamps.
+          var status = {};
+          for (var i = 0; i < len; i++) {
+            status[tokens[i]] = data[i];
+          }
+
+          // Send them back.
+          res.send(status);
+        });
+      });
+    });
+  }
+  else {
+    res.send(500);
+  }
 }
