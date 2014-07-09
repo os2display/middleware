@@ -157,6 +157,7 @@ app.post('/screen/remove', routes_backend.screenRemove);
 app.post('/push/channel', routes_backend.pushChannel);
 app.post('/push/emergency', routes_backend.pushEmergency);
 app.post('/status', routes_backend.status);
+app.get('/status/all', routes_backend.statusAll);
 
 /************************************
  * Client API

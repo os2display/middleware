@@ -215,9 +215,10 @@ exports.status = function (req, res) {
     config.file({ file: 'config.json' });
 
     // Connect to redis server.
-    var rediesConf = config.get('redis')
+    var rediesConf = config.get('redis');
     var redis = require("redis").createClient(rediesConf.port, rediesConf.host, { 'auth_pass': rediesConf.auth });
     redis.on('error', function (err) {
+      console.log(err);
       res.send(500);
     });
     redis.on("connect", function (status) {
@@ -234,7 +235,8 @@ exports.status = function (req, res) {
           // Link tokens and timestamps.
           var status = {};
           for (var i = 0; i < len; i++) {
-            status[tokens[i]] = data[i];
+            var info = JSON.parse(data[i]);
+            status[tokens[i]] = info.time;
           }
 
           // Send them back.
@@ -246,4 +248,45 @@ exports.status = function (req, res) {
   else {
     res.send(500);
   }
+}
+
+/**
+ * Implements status get all request.
+ */
+exports.statusAll = function (req, res) {
+  if (!accessCheck(req)) {
+    res.send(403);
+    return;
+  };
+
+  // Load configuration.
+  var config = require('nconf');
+  config.file({ file: 'config.json' });
+
+  // Connect to redis server.
+  var rediesConf = config.get('redis');
+  var redis = require("redis").createClient(rediesConf.port, rediesConf.host, { 'auth_pass': rediesConf.auth });
+  redis.on('error', function (err) {
+    res.send(500);
+  });
+  redis.on("connect", function (status) {
+    redis.select(rediesConf.db, function() {
+      var status = {};
+
+      // Get all heartbeats.
+      redis.hgetall('screen:heartbeats', function(err, data) {
+        if (err) {
+          res.send(501);
+        }
+
+        for (var token in data) {
+          var info = JSON.parse(data[token]);
+          status[info.name] = info.time;
+        }
+
+        // Send them back.
+        res.send(status);
+      });
+    });
+  });
 }
