@@ -3,12 +3,14 @@
  * Defines the reset API routes used by the back-end.
  */
 
+// Load configuration.
+var config = require('nconf');
+config.file({ file: 'config.json' });
+
 /**
  * Helper function to check the backend request only comes from the backend.
  */
 function accessCheck(req) {
-  var config = require('nconf');
-  config.file({ file: 'config.json' });
   if (config.get('backend').ip === req.ip) {
     return true;
   }
@@ -91,7 +93,7 @@ exports.screenReload = function (req, res) {
   // Reload based on groups.
   else if (req.body.groups !== undefined) {
     var groups = req.body.groups;
-    var connection = require('./lib/connection');
+    var connection = require('../lib/connection');
     connection.boardcast(groups, 'reload', {});
 
     res.send(200);
@@ -210,10 +212,6 @@ exports.status = function (req, res) {
 
   // Check parameter exists.
   if (req.body.screens !== undefined) {
-    // Load configuration.
-    var config = require('nconf');
-    config.file({ file: 'config.json' });
-
     // Connect to redis server.
     var rediesConf = config.get('redis');
     var redis = require("redis").createClient(rediesConf.port, rediesConf.host, { 'auth_pass': rediesConf.auth });
@@ -258,10 +256,6 @@ exports.statusAll = function (req, res) {
     res.send(403);
     return;
   };
-
-  // Load configuration.
-  var config = require('nconf');
-  config.file({ file: 'config.json' });
 
   // Connect to redis server.
   var rediesConf = config.get('redis');
