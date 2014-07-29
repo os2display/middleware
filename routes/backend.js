@@ -237,6 +237,9 @@ exports.status = function (req, res) {
             status[tokens[i]] = info.time;
           }
 
+          // Close redis connection.
+          redis.quit();
+
           // Send them back.
           res.send(status);
         });
@@ -277,6 +280,9 @@ exports.statusAll = function (req, res) {
           var info = JSON.parse(data[token]);
           status[token] = {time: info.time};
         }
+
+        // Close redis connection.
+        redis.quit();
 
         // Send them back.
         res.send(status);
