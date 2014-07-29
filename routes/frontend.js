@@ -21,7 +21,7 @@ exports.activate = function (req, res, jwt_secret) {
 
     // Call backend to get screen information.
     var Request = require('../lib/request');
-    var request= new Request();
+    var request = new Request();
     request.send('/api/screen/activate', {
       activationCode: activationCode,
       token: token
