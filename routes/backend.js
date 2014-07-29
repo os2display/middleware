@@ -275,7 +275,7 @@ exports.statusAll = function (req, res) {
 
         for (var token in data) {
           var info = JSON.parse(data[token]);
-          status[info.name] = info.time;
+          status[token] = {time: info.time};
         }
 
         // Send them back.
