@@ -20,7 +20,7 @@ function accessCheck(req) {
 /**
  * Update screen information.
  */
-exports.screenUpdate = function (req, res) {
+exports.screenUpdate = function screenUpdate(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
@@ -61,7 +61,7 @@ exports.screenUpdate = function (req, res) {
  *
  * Loads the screen based on screenID and sends reload command.
  */
-exports.screenReload = function (req, res) {
+exports.screenReload = function screenReload(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
@@ -108,7 +108,7 @@ exports.screenReload = function (req, res) {
  *
  * Removes the screen form local cache (forced reload from backend).
  */
-exports.screenRemove = function (req, res) {
+exports.screenRemove = function screenRemove(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
@@ -152,7 +152,7 @@ exports.screenRemove = function (req, res) {
 /**
  * Implements push channel content.
  */
-exports.pushChannel = function (req, res) {
+exports.pushChannel = function pushChannel(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
@@ -192,7 +192,7 @@ exports.pushChannel = function (req, res) {
 /**
  * Implements emergency content push.
  */
-exports.pushEmergency = function (req, res) {
+exports.pushEmergency = function pushEmergency(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
@@ -204,7 +204,7 @@ exports.pushEmergency = function (req, res) {
 /**
  * Implements status request.
  */
-exports.status = function (req, res) {
+exports.status = function status(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;

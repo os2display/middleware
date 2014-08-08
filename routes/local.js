@@ -13,7 +13,7 @@ config.file({ file: 'config.json' });
 /**
  * Index page (/).
  */
-exports.index = function (req, res) {
+exports.index = function index(req, res) {
   res.render('index', { sitename: config.get('sitename') });
 };
 
@@ -23,7 +23,7 @@ exports.index = function (req, res) {
  * The maintenance login page, used to get token an socket auth
  * token. Which can be used to pull proxy status information.
  */
-exports.login = function (req, res, jwt_secret) {
+exports.login = function login(req, res, jwt_secret) {
   var profile = {
     username: req.body.username,
     password: req.body.password
