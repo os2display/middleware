@@ -244,7 +244,7 @@ exports.status = function status(req, res) {
 /**
  * Implements status get all request.
  */
-exports.statusAll = function (req, res) {
+exports.statusAll = function statusAll(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
