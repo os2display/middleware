@@ -15,4 +15,4 @@ describe("Screen object test", function() {
 
   // Remove
 
-}):
+});
