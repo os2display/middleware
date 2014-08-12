@@ -265,7 +265,7 @@ exports.statusAll = function statusAll(req, res) {
     }
 
     // Close redis connection.
-    redis.quit();
+    cache.quit();
 
     // Send them back.
     res.send(status);
