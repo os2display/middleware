@@ -8,7 +8,7 @@ describe("Cache test", function() {
   /**
    * Test the connection.
    */
-  describe("Connection", function() {
+  describe("Connection - ", function() {
     var originalTimeout;
     var cache;
 
@@ -44,7 +44,7 @@ describe("Cache test", function() {
   /**
    * Test simple string set and get methods.
    */
-  describe("Simple set and get", function() {
+  describe("Simple set, get, remove and clear - ", function() {
     var cache = require('./../lib/cache');
 
     // Set.
@@ -61,23 +61,86 @@ describe("Cache test", function() {
       cache.get('jasmine-test', function(err, res) {
         expect(err).toBeNull();
         expect(res).toEqual('test-value');
-
-        // Clean up.
-        cache.clearAll();
         done();
+      });
+    });
+
+    // Remove.
+    it("Remove value", function(done) {
+      cache.remove('jasmine-test', function(err, res) {
+        // Returns the number of keys removed.
+        expect(err).toBeNull();
+        expect(res).toEqual(1);
+
+        // Test that the key have been removed.
+        cache.get('jasmine-test', function(err, res) {
+          expect(err).toBeNull();
+          expect(res).toBeNull();
+          done();
+        });
+      });
+    });
+
+    // Cache clear.
+    it("Clear cache", function(done) {
+      cache.set('jasmine-test', 'test-value', function(err, res) {
+        cache.clearAll();
+
+        cache.get('jasmine-test', function(err, res) {
+          expect(err).toBeNull();
+          expect(res).toBeNull();
+          done();
+        });
       });
     });
   });
 
-  // Remove.
-
   // Sets
+  describe("Sets add, get and remove - ", function() {
+    var cache = require('./../lib/cache');
+    // Add
+    it("Set value", function(done) {
+      cache.addSet('jasmine-test', 'test-value-1', function(err, res) {
+        expect(err).toBeNull();
+        expect(res).toEqual(1);
 
-  // // Add
+        cache.addSet('jasmine-test', 'test-value-2', function(err, res) {
+          expect(err).toBeNull();
+          expect(res).toEqual(1);
+          done();
+        });
+      });
+    });
 
-  // // Get
+    // Get
+    it("Get values (member of set)", function(done) {
+      cache.membersOfSet('jasmine-test', function(err, res) {
+        expect(err).toBeNull();
+        expect(res).toEqual([ 'test-value-2', 'test-value-1' ]);
+        done();
+      });
+    });
 
-  // // Member of
+    // Remove.
+    it("Remove values", function(done) {
+      cache.removeSet('jasmine-test', 'test-value-2', function(err, res) {
+        // Returns the number of keys removed.
+        expect(err).toBeNull();
+        expect(res).toEqual(1);
+
+        // Test that the key have been removed.
+        cache.membersOfSet('jasmine-test', function(err, res) {
+          expect(err).toBeNull();
+          expect(res).toEqual([ 'test-value-1' ]);
+
+          // Remove last set value.
+          cache.clearAll();
+          done();
+        });
+      });
+    });
+
+  });
 
   // Hash
 

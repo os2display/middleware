@@ -3,7 +3,7 @@
 * Node jasmine 2.0 Configuration object tests.
 */
 
-describe("Configuration tests", function() {
+describe("Configuration tests - ", function() {
 
   // Test that configuration gets loaded.
   it("Get options", function() {
