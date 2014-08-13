@@ -4,4 +4,5 @@
  */
 
 require('./configuration.spec');
+require('./logger.spec');
 require('./cache.spec');
