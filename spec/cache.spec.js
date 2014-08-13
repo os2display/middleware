@@ -7,21 +7,7 @@ describe("Cache test", function() {
   // Load cache module and override its configuration.
   var rewire = require('rewire');
   var cache = rewire('./../lib/cache');
-  cache.__set__('config', {
-    get: function(property) {
-      if (property === 'cache') {
-        return {
-          "port": "6379",
-          "host": "localhost",
-          "auth": null,
-          "db": 15
-        };
-      }
-      if (property === 'debug') {
-        return false;
-      }
-    }
-  });
+  cache.__set__('config', require('./mocks/configuration.mock'));
 
   // Ensure that the test storage is empty.
   cache.clearAll();
@@ -194,5 +180,14 @@ describe("Cache test", function() {
       });
     });
 
+    // Remove test hash.
+    it("Remove hash", function(done) {
+      cache.remove('jasmine-test', function(err, res) {
+          // Returns the number of keys removed.
+          expect(err).toBeNull();
+          expect(res).toEqual(1);
+          done();
+      });
+    });
   });
 });
