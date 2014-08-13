@@ -4,23 +4,41 @@
 */
 
 describe("Cache test", function() {
+  // Load cache module and override its configuration.
+  var rewire = require('rewire');
+  var cache = rewire('./../lib/cache');
+  cache.__set__('config', {
+    get: function(property) {
+      if (property === 'cache') {
+        return {
+          "port": "6379",
+          "host": "localhost",
+          "auth": null,
+          "db": 15
+        };
+      }
+      if (property === 'debug') {
+        return false;
+      }
+    }
+  });
+
+  // Ensure that the test storage is empty.
+  cache.clearAll();
 
   /**
    * Test the connection.
    */
   describe("Connection - ", function() {
     var originalTimeout;
-    var cache;
 
     beforeEach(function() {
-      cache = require('./../lib/cache');
-      cache.clearAll();
-
       originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
     });
 
     it("Create connection", function(done) {
+      cache.connect();
       cache.once('connected', function(data) {
         // Try to get value to verify connection.
         cache.get('jasmine-test', function(err, res) {
@@ -45,8 +63,6 @@ describe("Cache test", function() {
    * Test simple string set and get methods.
    */
   describe("Simple set, get, remove and clear - ", function() {
-    var cache = require('./../lib/cache');
-
     // Set.
     it("Set value", function(done) {
       cache.set('jasmine-test', 'test-value', function(err, res) {
@@ -95,9 +111,10 @@ describe("Cache test", function() {
     });
   });
 
-  // Sets
+  /**
+   * Test sets with set, membersof and remove.
+   */
   describe("Sets add, get and remove - ", function() {
-    var cache = require('./../lib/cache');
     // Add
     it("Set value", function(done) {
       cache.addSet('jasmine-test', 'test-value-1', function(err, res) {
@@ -142,16 +159,40 @@ describe("Cache test", function() {
 
   });
 
-  // Hash
+  /**
+   * Test hash tables with add, get and remove.
+   */
+  describe("Hashes add, get and remove - ", function() {
+    // Set
+    it("Set values", function(done) {
+      cache.hashSet('jasmine-test', '1234', 'value 1', function(err, res) {
+        expect(err).toBeNull();
+        expect(res).toEqual(1);
+        done();
+      });
+    });
 
-  // // Set
+    // Get all fields
+    it("Get fields value", function(done) {
+      cache.hashSet('jasmine-test', '4321', 'value 2', function(err, res) {
+        cache.hashSet('jasmine-test', '5412', 'value 3', function(err, res) {
+          cache.hashGetAllFields('jasmine-test', ['1234', '4321'], function(err, res) {
+            expect(err).toBeNull();
+            expect(res).toEqual([ 'value 1', 'value 2' ]);
+            done();
+          });
+        });
+      });
+    });
 
-  // // Get
+    // Get all
+    it("Get fields value", function(done) {
+      cache.hashGetAll('jasmine-test', function(err, res) {
+        expect(err).toBeNull();
+        expect(res).toEqual({ 1234 : 'value 1', 4321 : 'value 2', 5412 : 'value 3' });
+        done();
+      });
+    });
 
-  // // Get all fields
-
-  // // Get all
-
-  // Clear cache
-
+  });
 });
