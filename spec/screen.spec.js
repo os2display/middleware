@@ -4,15 +4,25 @@
 */
 
 describe("Screen object test", function() {
+  // Get screen object with rewrite.
+  var rewire = require('rewire');
+  var screen = rewire('./../lib/screen');
 
-  // Create
+  // Override request.
+  screen.__set__('Request', require('./mocks/request.mock'));
 
-  // Save
+  // Create client.
+  var client = require('./mocks/client.mock');
 
-  // Load
+  it()
+  // Load.
 
-  // Push
+  // Save.
 
-  // Remove
+  // Remove.
+
+  // Push.
+
+  // Reload.
 
 });
