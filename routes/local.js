@@ -7,8 +7,7 @@
 var jwt = require('jsonwebtoken');
 
 // Load configuration.
-var config = require('nconf');
-config.file({ file: 'config.json' });
+var config = require('./../lib/configuration');
 
 /**
  * Index page (/).

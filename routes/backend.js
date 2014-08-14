@@ -4,8 +4,7 @@
  */
 
 // Load configuration.
-var config = require('nconf');
-config.file({ file: 'config.json' });
+var config = require('./../lib/configuration');
 
 /**
  * Helper function to check the backend request only comes from the backend.

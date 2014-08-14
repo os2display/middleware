@@ -12,7 +12,7 @@
     "socketio-jwt" : "2.3.1",
     "nconf" : "0.6.9",
     "log" : "1.4.0",
-    "optimist" : "0.6.0",
+    "minimist" : "1.1.*",
     "rewire" : "2.1.*"
   }
 }
