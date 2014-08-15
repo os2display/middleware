@@ -38,9 +38,10 @@ exports.activate = function activate(req, res, jwt_secret) {
     });
   }
   else {
-    var Log = require('log')
-    var logger = new Log('info', fs.createWriteStream(config.get('log'), {'flags': 'a'}));
+    var logger = require('./../lib/logger');
+    logger.on('error', function() {
+      res.send(403);
+    });
     logger.error('Activation code was not found.');
-    res.send(500);
   }
 }
