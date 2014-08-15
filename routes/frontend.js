@@ -42,6 +42,6 @@ exports.activate = function activate(req, res, jwt_secret) {
     logger.on('error', function() {
       res.send(403);
     });
-    logger.error('Activation code was not found.');
+    logger.error(500, 'Activation code was not found.');
   }
 }
