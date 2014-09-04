@@ -23,7 +23,7 @@ exports.screenUpdate = function screenUpdate(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   if (req.body.token !== undefined) {
     var Screen = require('../lib/screen')
@@ -64,7 +64,7 @@ exports.screenReload = function screenReload(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   // Reload base on screens.
   if (req.body.screens !== undefined) {
@@ -111,7 +111,7 @@ exports.screenRemove = function screenRemove(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   if (req.body.token !== undefined) {
     // Load the screen and remove it.
@@ -155,7 +155,7 @@ exports.pushChannel = function pushChannel(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   if (req.body.channelID !== undefined) {
     // Create new channel object.
@@ -195,7 +195,7 @@ exports.pushEmergency = function pushEmergency(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   res.send(501);
 }
@@ -207,7 +207,7 @@ exports.status = function status(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   // Check parameter exists.
   if (req.body.screens !== undefined) {
@@ -247,7 +247,7 @@ exports.statusAll = function statusAll(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   var cache = require('./../lib/cache');
   cache.hashGetAll('screen:heartbeats', function(err, data) {
@@ -259,7 +259,7 @@ exports.statusAll = function statusAll(req, res) {
       var info = JSON.parse(data[token]);
       status[token] = {
         "time": info.time,
-        "name": info.name,
+        "name": info.name
       };
     }
 
