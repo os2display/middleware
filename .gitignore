@@ -3,3 +3,5 @@ config*.json
 dump.rdb
 ssl/ind*
 *.log
+*.pid
+pid
