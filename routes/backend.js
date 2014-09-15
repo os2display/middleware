@@ -4,8 +4,7 @@
  */
 
 // Load configuration.
-var config = require('nconf');
-config.file({ file: 'config.json' });
+var config = require('./../lib/configuration');
 
 /**
  * Helper function to check the backend request only comes from the backend.
@@ -20,11 +19,11 @@ function accessCheck(req) {
 /**
  * Update screen information.
  */
-exports.screenUpdate = function (req, res) {
+exports.screenUpdate = function screenUpdate(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   if (req.body.token !== undefined) {
     var Screen = require('../lib/screen')
@@ -61,11 +60,11 @@ exports.screenUpdate = function (req, res) {
  *
  * Loads the screen based on screenID and sends reload command.
  */
-exports.screenReload = function (req, res) {
+exports.screenReload = function screenReload(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   // Reload base on screens.
   if (req.body.screens !== undefined) {
@@ -108,11 +107,11 @@ exports.screenReload = function (req, res) {
  *
  * Removes the screen form local cache (forced reload from backend).
  */
-exports.screenRemove = function (req, res) {
+exports.screenRemove = function screenRemove(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   if (req.body.token !== undefined) {
     // Load the screen and remove it.
@@ -152,11 +151,11 @@ exports.screenRemove = function (req, res) {
 /**
  * Implements push channel content.
  */
-exports.pushChannel = function (req, res) {
+exports.pushChannel = function pushChannel(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   if (req.body.channelID !== undefined) {
     // Create new channel object.
@@ -192,11 +191,11 @@ exports.pushChannel = function (req, res) {
 /**
  * Implements emergency content push.
  */
-exports.pushEmergency = function (req, res) {
+exports.pushEmergency = function pushEmergency(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   res.send(501);
 }
@@ -204,46 +203,36 @@ exports.pushEmergency = function (req, res) {
 /**
  * Implements status request.
  */
-exports.status = function (req, res) {
+exports.status = function status(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
   // Check parameter exists.
   if (req.body.screens !== undefined) {
-    // Connect to redis server.
-    var rediesConf = config.get('redis');
-    var redis = require("redis").createClient(rediesConf.port, rediesConf.host, { 'auth_pass': rediesConf.auth });
-    redis.on('error', function (err) {
-      console.log(err);
-      res.send(500);
-    });
-    redis.on("connect", function (status) {
-      redis.select(rediesConf.db, function() {
-        var status = {};
-        var tokens = req.body.screens;
-        var len = tokens.length;
+    var status = {};
+    var tokens = req.body.screens;
 
-        redis.hmget('screen:heartbeats', tokens, function(err, data) {
-          if (err) {
-            res.send(501);
-          }
+    var cache = require('./../lib/cache');
+    cache.hashGetAllFields('screen:heartbeats', tokens, function(err, data) {
+      if (err) {
+        res.send(501);
+      }
 
-          // Link tokens and timestamps.
-          var status = {};
-          for (var i = 0; i < len; i++) {
-            var info = JSON.parse(data[i]);
-            status[tokens[i]] = info.time;
-          }
+      // Link tokens and timestamps.
+      var status = {};
+      var len = data.length;
+      for (var i = 0; i < len; i++) {
+        // If tokens don't have a hash value it returns null.
+        if (data[i] !== null) {
+          var info = JSON.parse(data[i]);
+          status[info.token] = info.time;
+        }
+      }
 
-          // Close redis connection.
-          redis.quit();
-
-          // Send them back.
-          res.send(status);
-        });
-      });
+      // Send them back.
+      res.send(status);
     });
   }
   else {
@@ -254,39 +243,30 @@ exports.status = function (req, res) {
 /**
  * Implements status get all request.
  */
-exports.statusAll = function (req, res) {
+exports.statusAll = function statusAll(req, res) {
   if (!accessCheck(req)) {
     res.send(403);
     return;
-  };
+  }
 
-  // Connect to redis server.
-  var rediesConf = config.get('redis');
-  var redis = require("redis").createClient(rediesConf.port, rediesConf.host, { 'auth_pass': rediesConf.auth });
-  redis.on('error', function (err) {
-    res.send(500);
-  });
-  redis.on("connect", function (status) {
-    redis.select(rediesConf.db, function() {
-      var status = {};
+  var cache = require('./../lib/cache');
+  cache.hashGetAll('screen:heartbeats', function(err, data) {
+    if (err) {
+      res.send(501);
+    }
 
-      // Get all heartbeats.
-      redis.hgetall('screen:heartbeats', function(err, data) {
-        if (err) {
-          res.send(501);
-        }
+    for (var token in data) {
+      var info = JSON.parse(data[token]);
+      status[token] = {
+        "time": info.time,
+        "name": info.name
+      };
+    }
 
-        for (var token in data) {
-          var info = JSON.parse(data[token]);
-          status[token] = {time: info.time};
-        }
+    // Close redis connection.
+    cache.quit();
 
-        // Close redis connection.
-        redis.quit();
-
-        // Send them back.
-        res.send(status);
-      });
-    });
+    // Send them back.
+    res.send(status);
   });
 }

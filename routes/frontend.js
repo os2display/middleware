@@ -12,7 +12,7 @@ var jwt = require('jsonwebtoken');
  * If the code is valided an sign token is returned that can be
  * used to establish the socket connection.
  */
-exports.activate = function (req, res, jwt_secret) {
+exports.activate = function activate(req, res, jwt_secret) {
   var activationCode = req.body.activationCode;
 
   if (activationCode != undefined) {
@@ -38,9 +38,10 @@ exports.activate = function (req, res, jwt_secret) {
     });
   }
   else {
-    var Log = require('log')
-    var logger = new Log('info', fs.createWriteStream(config.get('log'), {'flags': 'a'}));
-    logger.error('Activation code was not found.');
-    res.send(500);
+    var logger = require('./../lib/logger');
+    logger.on('error', function() {
+      res.send(403);
+    });
+    logger.error(500, 'Activation code was not found.');
   }
 }

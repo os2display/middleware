@@ -10,12 +10,14 @@ var path = require('path');
 var express = require('express');
 var fs = require('fs');
 
+// Parse commandline args.
+var argv = require('minimist')(process.argv.slice(2));
+
 // Start the app.
 var app = express();
 
 // Load configuration.
-var config = require('nconf');
-config.file({ file: 'config.json' });
+var config = require('./lib/configuration');
 
 // Add logger.
 var Log = require('log')
