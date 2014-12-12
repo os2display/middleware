@@ -1,0 +1,9 @@
+{
+  "name": "IKMiddleware",
+  "description": "Middleware to handle communication between symfony and the front-end clients",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "architect" : "0.1.11"
+  }
+}
