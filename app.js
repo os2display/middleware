@@ -26,12 +26,17 @@ var config = [
   },
   {
     "packagePath": "./plugins/socket"
+  },
+  {
+    "packagePath": "./plugins/api"
   }
 ];
 
 // User the configuration to start the application.
 config = architect.resolveConfig(config, __dirname);
 architect.createApp(config, function (err, app) {
+  "use strict";
+
   if (err) {
     throw err;
   }
