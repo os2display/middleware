@@ -1,0 +1,8 @@
+{
+  "port": 3020,
+  "secret": "MySuperSecret",
+  "log": {
+    "file": "messages.log",
+    "debug": false
+  }
+}
