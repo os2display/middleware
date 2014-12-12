@@ -4,5 +4,11 @@
   "log": {
     "file": "messages.log",
     "debug": false
+  },
+  "cache": {
+    "port": "6379",
+    "host": "localhost",
+    "auth": null,
+    "db": 0
   }
 }

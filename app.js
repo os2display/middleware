@@ -25,6 +25,10 @@ var config = [
     "path": path.join(__dirname, 'public')
   },
   {
+    "packagePath": "./plugins/cache",
+    "config": configs.cache
+  },
+  {
     "packagePath": "./plugins/socket"
   },
   {
