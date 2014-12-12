@@ -1,6 +1,6 @@
 /**
  * @file
- * Added API to handle communicaton with the backend.
+ * Added API to handle restful communication.
  */
 
 var Q = require('q');
@@ -20,14 +20,6 @@ module.exports = function (options, imports, register) {
      */
     app.get('/api', function (req, res) {
       res.send('Please see documentation about using this api.');
-    });
-
-
-    /**
-     * Screen: activate.
-     */
-    app.post('/api/screen', function (req, res) {
-
     });
 
     /**

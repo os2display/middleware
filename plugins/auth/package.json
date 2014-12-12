@@ -1,0 +1,22 @@
+{
+  "name": "Auth",
+  "description": "Provides authentication with API-key to the API",
+  "version": "0.0.1",
+  "main": "auth.js",
+  "private": true,
+  "dependencies": {
+    "express-jwt": "^0.5.0",
+    "jsonwebtoken": "^1.1.2",
+    "request": "^2.51.0"
+  },
+  "plugin": {
+    "provides": [
+      "auth"
+    ],
+    "consumes": [
+      "app",
+      "logger",
+      "apikeys"
+    ]
+  }
+}

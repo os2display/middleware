@@ -29,7 +29,16 @@ var config = [
     "config": configs.cache
   },
   {
+    "packagePath": "./plugins/apikeys",
+    "file": __dirname + '/' + configs.apikeys
+  },
+  {
     "packagePath": "./plugins/socket"
+  },
+  {
+    "packagePath": "./plugins/auth",
+    "secret": configs.secret,
+    "admin": configs.admin
   },
   {
     "packagePath": "./plugins/api"

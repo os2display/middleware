@@ -75,6 +75,7 @@ module.exports = function (options, imports, register) {
 
   var logger = new Logger(options.filename, options.debug || false);
 
+  // Register the plugin with the system.
   register(null, {
     "logger": logger
   });

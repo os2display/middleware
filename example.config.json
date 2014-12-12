@@ -5,10 +5,15 @@
     "file": "messages.log",
     "debug": false
   },
+  "admin": {
+    "username": "admin",
+    "password": "admin"
+  },
   "cache": {
     "port": "6379",
     "host": "localhost",
     "auth": null,
     "db": 0
-  }
+  },
+  "apikeys": "apikeys.json"
 }
