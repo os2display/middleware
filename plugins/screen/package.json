@@ -1,0 +1,20 @@
+{
+  "name": "Screen",
+  "description": "Screen objects",
+  "version": "0.0.1",
+  "main": "screen.js",
+  "private": true,
+  "plugin": {
+    "provides": [
+      "screen"
+    ],
+    "consumes": [
+      "logger",
+      "cache"
+    ]
+  },
+  "dependencies": {
+    "q": "^1.1.2",
+    "request-json": "^0.5.0"
+  }
+}

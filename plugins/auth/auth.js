@@ -96,43 +96,53 @@ module.exports = function (options, imports, register) {
    */
   app.post('/screen/activate', function (req, res) {
     var activationCode = req.body.activationCode;
-    var server = req.body.server;
+    var apikey = req.body.apikey;
 
     if (activationCode !== undefined) {
-      var profile = {
-        "role": 'screen',
-        "activationCode": activationCode
-      };
-
-      // Generate token for access.
-      var token = jwt.sign(profile, options.secret);
-
       // Build json object to send to the backend.
       var data = {
-        "activationCode": activationCode,
-        "token": token
+        "activationCode": activationCode
       };
 
       // Ignore self signed certificate.
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-      // Call backend to get screen information.
-      var client = request.newClient(server);
-      client.post('api/screen/activate', data, function(error, response, body) {
-        if (!error) {
-          if (response.statusCode === 200) {
-            // Activation code accepted, so send back the token to the client.
-            res.json({token: token});
-          }
-          else {
-            res.send('Activation code could not be validated.', response.statusCode);
-          }
-        }
-        else {
-          // Activation failed, so send error message back to the client.
+      imports.apikeys.get(apikey).then(
+        function (info) {
+          // Call backend to get screen information.
+          var client = request.newClient(info.backend);
+          client.post('api/screen/activate', data, function(error, response, body) {
+            if (!error) {
+              if (response.statusCode === 200) {
+                // JWT profile.
+                var profile = {
+                  "role": 'screen',
+                  "activationCode": activationCode,
+                  "apikey": apikey,
+                  "screenID": body.id,
+                  "screenTitle": body.title
+                };
+
+                // Generate token for access.
+                var token = jwt.sign(profile, options.secret);
+
+                // Activation code accepted, so send back the token to the client.
+                res.json({token: token});
+              }
+              else {
+                res.send('Activation code could not be validated.', response.statusCode);
+              }
+            }
+            else {
+              // Activation failed, so send error message back to the client.
+              res.send(error.message, 500);
+            }
+          });
+        },
+        function (error) {
           res.send(error.message, 500);
         }
-      });
+      );
     }
     else {
       res.send('Activation code could not be validated.', 401);

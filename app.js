@@ -45,6 +45,9 @@ var config = [
     "packagePath": "./plugins/client"
   },
   {
+    "packagePath": "./plugins/screen"
+  },
+  {
     "packagePath": "./plugins/api"
   }
 ];
