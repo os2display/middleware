@@ -113,8 +113,10 @@ module.exports = function (options, imports, register) {
         "token": token
       };
 
-      // Call backend to get screen information.
+      // Ignore self signed certificate.
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+      // Call backend to get screen information.
       var client = request.newClient(server);
       client.post('api/screen/activate', data, function(error, response, body) {
         if (!error) {

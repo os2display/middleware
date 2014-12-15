@@ -5,12 +5,15 @@
   "main": "socket.js",
   "private": true,
   "dependencies": {
-    "socket.io" : "1.0.x",
-    "jsonwebtoken" : "0.4.0",
-    "socketio-jwt" : "2.3.1"
+    "jsonwebtoken": "0.4.0",
+    "q": "^1.1.2",
+    "socket.io": "1.0.x",
+    "socketio-jwt": "^2.3.1"
   },
   "plugin": {
-    "provides": [ "socket" ],
+    "provides": [
+      "socket"
+    ],
     "consumes": [
       "logger",
       "server"

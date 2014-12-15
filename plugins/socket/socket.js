@@ -6,20 +6,11 @@
 // Private variables.
 var sio;
 
-/**
- * Function to add JWT handshake to the auth process.
- *
- * @TODO: Move this to an auth plugin.
- */
-var secureConnectEnable = function secureConnectEnable(secret) {
-  "use strict";
+// Load JWT to handle secure auth.
+var jwt = require("socketio-jwt");
 
-  var socketio_jwt = require('socketio-jwt');
-  sio.set('authorization', socketio_jwt.authorize({
-    secret: secret,
-    handshake: true
-  }));
-};
+// Get promise support.
+var Q = require('q');
 
 /**
  * Default constructor.
@@ -32,13 +23,10 @@ var secureConnectEnable = function secureConnectEnable(secret) {
 var SocketIO = function(server, secret) {
   "use strict";
 
+  this.secret= secret;
+
   // Get socket.io started.
   sio = require('socket.io')(server);
-
-  // Check if JWT security should be used.
-  if (secret !== undefined) {
-    secureConnectEnable(secret);
-  }
 };
 
 /**
@@ -63,6 +51,24 @@ SocketIO.prototype.emit = function emit(eventName, data, callback) {
       callback.apply(sio, arguments);
     }
   });
+};
+
+/**
+ * Handle JWT socket authentication.
+ */
+SocketIO.prototype.auth = function auth() {
+  "use strict";
+
+  var deferred = Q.defer();
+
+  sio.sockets.on('connection', jwt.authorize({
+    secret: this.secret,
+    timeout: 5000
+  })).on('authenticated', function(socket) {
+    deferred.resolve(socket);
+  });
+
+  return deferred.promise;
 };
 
 /**
