@@ -114,15 +114,21 @@ module.exports = function (options, imports, register) {
       };
 
       // Call backend to get screen information.
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
       var client = request.newClient(server);
       client.post('api/screen/activate', data, function(error, response, body) {
-        if (!error && response.statusCode === 200) {
-          // Activation code accepted, so send back the token to the client.
-          res.json({ token: token });
+        if (!error) {
+          if (response.statusCode === 200) {
+            // Activation code accepted, so send back the token to the client.
+            res.json({token: token});
+          }
+          else {
+            res.send('Activation code could not be validated.', response.statusCode);
+          }
         }
         else {
           // Activation failed, so send error message back to the client.
-          res.send(error.message, data.statusCode);
+          res.send(error.message, 500);
         }
       });
     }
