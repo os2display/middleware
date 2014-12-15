@@ -9,9 +9,6 @@ var sio;
 // Load JWT to handle secure auth.
 var jwt = require("socketio-jwt");
 
-// Get promise support.
-var Q = require('q');
-
 /**
  * Default constructor.
  *
@@ -23,10 +20,14 @@ var Q = require('q');
 var SocketIO = function(server, secret) {
   "use strict";
 
-  this.secret= secret;
-
   // Get socket.io started.
   sio = require('socket.io')(server);
+
+  // Authentication.
+  sio.set('authorization', jwt.authorize({
+    secret: secret,
+    handshake: true
+  }));
 };
 
 /**
@@ -54,31 +55,13 @@ SocketIO.prototype.emit = function emit(eventName, data, callback) {
 };
 
 /**
- * Handle JWT socket authentication.
- */
-SocketIO.prototype.auth = function auth() {
-  "use strict";
-
-  var deferred = Q.defer();
-
-  sio.sockets.on('connection', jwt.authorize({
-    secret: this.secret,
-    timeout: 5000
-  })).on('authenticated', function(socket) {
-    deferred.resolve(socket);
-  });
-
-  return deferred.promise;
-};
-
-/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {
   "use strict";
 
   // Ensure that only one socket server exists.
-  var socketIO = new SocketIO(imports.server, options.secret || undefined);
+  var socketIO = new SocketIO(imports.server, options.secret);
 
   // Register exposed function with architect.
   register(null, {

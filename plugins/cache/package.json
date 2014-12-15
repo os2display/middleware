@@ -1,5 +1,5 @@
 {
-  "name": "Cache (redis)",
+  "name": "Cache",
   "description": "Provides cache via redis key/value store",
   "version": "0.0.1",
   "main": "cache.js",

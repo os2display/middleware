@@ -33,12 +33,16 @@ var config = [
     "file": __dirname + '/' + configs.apikeys
   },
   {
-    "packagePath": "./plugins/socket"
+    "packagePath": "./plugins/socket",
+    "secret": configs.secret
   },
   {
     "packagePath": "./plugins/auth",
     "secret": configs.secret,
     "admin": configs.admin
+  },
+  {
+    "packagePath": "./plugins/client"
   },
   {
     "packagePath": "./plugins/api"
