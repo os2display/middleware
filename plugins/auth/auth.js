@@ -13,6 +13,9 @@ module.exports = function (options, imports, register) {
   var jwt = require('jsonwebtoken');
   var expressJwt = require('express-jwt');
 
+  // HTTP request.
+  var request = require('request-json');
+
   // Get express app.
   var app = imports.app;
 
@@ -93,6 +96,7 @@ module.exports = function (options, imports, register) {
    */
   app.post('/screen/activate', function (req, res) {
     var activationCode = req.body.activationCode;
+    var server = req.body.server;
 
     if (activationCode !== undefined) {
       var profile = {
@@ -103,23 +107,24 @@ module.exports = function (options, imports, register) {
       // Generate token for access.
       var token = jwt.sign(profile, options.secret);
 
+      // Build json object to send to the backend.
+      var data = {
+        "activationCode": activationCode,
+        "token": token
+      };
+
       // Call backend to get screen information.
-      //var Request = require('../lib/request');
-      //var request = new Request();
-      //request.send('/api/screen/activate', {
-      //  activationCode: activationCode,
-      //  token: token
-      //});
-      //
-      //request.on('completed', function(data) {
-      //  // Send valid token to the frontend.
-      //  res.json({ token: token });
-      //});
-      //
-      //request.on('error', function(data) {
-      //  // Error in the request send http code.
-      //  res.send(data.statusCode);
-      //});
+      var client = request.newClient(server);
+      client.post('api/screen/activate', data, function(error, response, body) {
+        if (!error && response.statusCode === 200) {
+          // Activation code accepted, so send back the token to the client.
+          res.json({ token: token });
+        }
+        else {
+          // Activation failed, so send error message back to the client.
+          res.send(error.message, data.statusCode);
+        }
+      });
     }
     else {
       res.send('Activation code could not be validated.', 401);
