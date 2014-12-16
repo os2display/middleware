@@ -41,25 +41,32 @@ module.exports = function (options, imports, register) {
           // Ignore self signed certificate.
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
+          imports.apikeys.get(self.apikey).then(
+            function (info) {
+              // Call backend to get screen information.
+              var client = request.newClient(info.backend);
+              client.post('api/screen/get', { "id": self.id }, function(error, response, body) {
+                if (!error) {
+                  if (response.statusCode === 200) {
+                    self.title = body.title;
 
-          // Call backend to get screen information.
-          //var req = new Request();
-          //req.send('/api/screen/get', { token: self.token });
-          //
-          //// Send request to the backend.
-          //req.on('completed', function(data) {
-          //  self.name = data.name;
-          //  self.groups = data.groups;
-          //
-          //  // Notify that the screen have been loaded.
-          //  self.emit('loaded', { 'cached' : false });
-          //});
-          //
-          //// Handle request error event.
-          //req.on('error', function() {
-          //  self.logger.error(404, 'The system could not find the screen.');
-          //  self.emit('error', { "code": 404, "message": 'The system could not find the screen.' });
-          //});
+                    // Notify that the screen have been loaded.
+                    deferred.resolve();
+                  }
+                  else {
+                    res.send('.', response.statusCode);
+                  }
+                }
+                else {
+                  // Screen request failed.
+                  res.send(error.message, 500);
+                }
+              });
+            },
+            function (error) {
+              res.send(error.message, 500);
+            }
+          );
         }
       }
     });
