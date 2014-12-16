@@ -4,6 +4,9 @@
 module.exports = function (options, imports, register) {
   "use strict";
 
+  // Load promise library.
+  var Q = require('q');
+
   // HTTP request.
   var request = require('request-json');
 
@@ -15,6 +18,11 @@ module.exports = function (options, imports, register) {
 
     this.title = undefined;
     this.socket = undefined;
+
+    // Injections.
+    this.logger = imports.logger;
+    this.cache = imports.cache;
+    this.apikeys = imports.apikeys;
   };
 
   Screen.prototype.load = function load() {
@@ -22,16 +30,14 @@ module.exports = function (options, imports, register) {
 
     var deferred = Q.defer();
 
-    imports.cache.get(self.key, function(err, res) {
+    self.cache.get(self.key, function(err, res) {
       if (err) {
-        self.logger.error('Scree: redis encounted an error in save.');
+        self.logger.error('Screen: redis encountered an error in load.');
         deferred.reject(err);
       }
       else {
         if (res !== null) {
           var data = JSON.parse(res);
-          self.id = data.id;
-          self.apikey = data.apikey;
           self.title = data.title;
 
           // Notify that the screen have been loaded.
@@ -41,7 +47,7 @@ module.exports = function (options, imports, register) {
           // Ignore self signed certificate.
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-          imports.apikeys.get(self.apikey).then(
+          self.apikeys.get(self.apikey).then(
             function (info) {
               // Call backend to get screen information.
               var client = request.newClient(info.backend);
@@ -54,17 +60,19 @@ module.exports = function (options, imports, register) {
                     deferred.resolve();
                   }
                   else {
-                    res.send('.', response.statusCode);
+                    // Error getting screen form backend.
+                    deferred.reject(new Error('No 200 code come back from the server.'));
                   }
                 }
                 else {
-                  // Screen request failed.
-                  res.send(error.message, 500);
+                  // Error getting screen form backend.
+                  deferred.reject(error);
                 }
               });
             },
             function (error) {
-              res.send(error.message, 500);
+              // API key problems.
+              deferred.reject(error);
             }
           );
         }
@@ -87,8 +95,6 @@ module.exports = function (options, imports, register) {
 
     // Information to store in redis.
     var data = {
-      id: self.id,
-      apikey: self.apikey,
       title: self.title
     };
 

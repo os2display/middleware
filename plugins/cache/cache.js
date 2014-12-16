@@ -134,7 +134,7 @@ module.exports = function (options, imports, register) {
     // Handle connection event.
     self.once('connected', function () {
       // Get value from service.
-      self.get(key, callback);
+      self.service.get(key, callback);
     });
 
     // Connect.

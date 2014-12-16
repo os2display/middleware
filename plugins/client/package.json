@@ -10,5 +10,8 @@
       "socket",
       "screen"
     ]
+  },
+  "dependencies": {
+    "q": "^1.1.2"
   }
 }
