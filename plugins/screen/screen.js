@@ -151,11 +151,20 @@ module.exports = function (options, imports, register) {
   };
 
   Screen.prototype.push = function push(data) {
+    var self = this;
 
+    // Check that screen is connected.
+    if (self.socket !== undefined) {
+      // Send channel/content to the screen.
+      self.socket.emit('channelPush', data);
+    }
+    else {
+      self.logger.info('Screen: content could not be pused to "' + self.key + '" as it is not connected.');
+    }
   };
 
   Screen.prototype.reload = function reload() {
-
+    var self = this;
   };
 
   // This plugin extends the server plugin and do not provide new services.

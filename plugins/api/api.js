@@ -101,6 +101,15 @@ module.exports = function (options, imports, register) {
 
       res.send(200);
     });
+
+    /**
+     * Channel: remove.
+     */
+    app.delete('/api/channel/:id/push', function (req, res) {
+      var profile = req.user;
+
+      res.send(200);
+    });
   };
 
   // Create the API routes using the API object.
