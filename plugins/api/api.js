@@ -57,11 +57,33 @@ module.exports = function (options, imports, register) {
     this.app.put('/api/screen/:id', function (req, res) {
       var profile = req.user;
 
-      // Get hold of the screen.
+      if (req.params.hasOwnProperty('id') && req.body.hasOwnProperty('title')) {
+        // Load screen.
+        var screen = new Screen(profile.apikey, req.params.id);
+        screen.load().then(
+          function (obj) {
+            // Set new screen properties.
+            screen.title = req.body.title;
 
-      // Update the screen.
-
-      res.send(200);
+            // Try to save the screen.
+            screen.save().then(
+              function () {
+                res.send(200);
+              },
+              function (error) {
+                res.send(error.message, 500);
+              }
+            );
+          },
+          function (error) {
+            res.send(error.message, 500);
+          }
+        );
+      }
+      else {
+        self.logger.error('API: missing id parameter in update screen.');
+        res.send('Missing parameters in update screen.', 500);
+      }
     });
 
     /**
@@ -89,8 +111,8 @@ module.exports = function (options, imports, register) {
         );
       }
       else {
-        self.logger.error('API: missing id parameter in remove channel.');
-        res.send('Missing parameters in remove channel.', 500);
+        self.logger.error('API: missing id parameter in reload screen.');
+        res.send('Missing parameters in reload screen.', 500);
       }
     });
 
