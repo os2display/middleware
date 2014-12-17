@@ -173,6 +173,26 @@ module.exports = function (options, imports, register) {
   };
 
   /**
+   * Send channel removed event to the screen.
+   *
+   * @param channelId
+   *   Id of the channel to remove.
+   */
+  Screen.prototype.removeContent = function removeContent(channelId) {
+    var self = this;
+
+    // Check that screen is connected.
+    var socket = self.socket.get(self.apikey, self.id);
+    if (socket) {
+      // Send channel/content to the screen.
+      socket.emit('channelRemoved', { "id": channelId });
+    }
+    else {
+      self.logger.info('Screen: content could not be pused to "' + self.key + '" as it is not connected.');
+    }
+  };
+
+  /**
    * Send reload command to the screen.
    */
   Screen.prototype.reload = function reload() {

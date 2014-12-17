@@ -53,7 +53,7 @@ module.exports = function (options, imports, register) {
           self.screens = data.screens;
 
           // Notify that the channel have been loaded.
-          deferred.resolve();
+          deferred.resolve(self);
         }
         else {
           self.logger.error('Channel: not found in cache (' + self.key + ') in load');
@@ -97,26 +97,37 @@ module.exports = function (options, imports, register) {
 
   /**
    * Remove channel information from cache.
-   *
-   * @returns {*}
-   *   Promise that the data will be saved.
    */
   Channel.prototype.remove = function remove() {
     var self = this;
 
-    var deferred = Q.defer();
-
-    self.cache.del(self.key, function(err, res) {
-      if (err) {
-        self.logger.error('Channel: redis encounted an error in save.');
-        deferred.reject(err);
-      }
-      else {
-        deferred.resolve();
-      }
-    });
-
-    return deferred.promise;
+    if (self.screens !== undefined) {
+      self.cache.del(self.key, function (err, res) {
+        if (err) {
+          self.logger.error('Channel: redis encounted an error in del channel.');
+        }
+        else {
+          // Find screens that displays the channel and send removed event.
+          for (var i in self.screens) {
+            var screenID = self.screens[i];
+            // Load screen.
+            var screen = new Screen(self.apikey, screenID);
+            screen.load().then(
+              function (obj) {
+                // Ask screen to push content.
+                obj.removeContent(self.id);
+              },
+              function (error) {
+                self.logger.error('Channel: screen load failed "' + error.message + '"');
+              }
+            );
+          }
+        }
+      });
+    }
+    else {
+      self.logger.error('Channel: remove failed as it did not contain any screens.');
+    }
   };
 
   /**

@@ -113,7 +113,25 @@ module.exports = function (options, imports, register) {
     this.app.delete('/api/channel/:id', function (req, res) {
       var profile = req.user;
 
-      res.send(200);
+      if (req.params.hasOwnProperty('id')) {
+        // Try to load channels.
+        var channel = new Channel(profile.apikey, req.params.id);
+        channel.load().then(
+          function (obj) {
+            obj.remove();
+
+            // Channel have been load, as we guess that it's removable.
+            res.send(200);
+          },
+          function (error) {
+            res.send(error.message, 500);
+          }
+        );
+      }
+      else {
+        self.logger.error('API: missing id parameter in remove channel.');
+        res.send('Missing parameters in remove channel.', 500);
+      }
     });
 
     /**
