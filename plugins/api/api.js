@@ -105,7 +105,7 @@ module.exports = function (options, imports, register) {
     /**
      * Channel: remove.
      */
-    app.delete('/api/channel/:id/push', function (req, res) {
+    app.post('/api/channel/:id/push', function (req, res) {
       var profile = req.user;
 
       res.send(200);
