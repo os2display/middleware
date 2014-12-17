@@ -1,4 +1,8 @@
 /**
+ * Handle screen objects.
+ */
+
+/**
  * Register the plugin with architect.
  */
 module.exports = function (options, imports, register) {

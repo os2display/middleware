@@ -60,10 +60,6 @@ module.exports = function (options, imports, register) {
    * Handle socket connection event from a client.
    */
   socket.on('connection', function (socket) {
-
-
-    console.log(clients);
-
     // Get the JWT decoded token.
     var profile = socket.client.request.decoded_token;
 
@@ -81,6 +77,10 @@ module.exports = function (options, imports, register) {
           screen.socket.emit('ready', {
             "statusCode": 200
           });
+
+          /**
+           * @TODO: Push content if content is ready.
+           */
         },
         function (error) {
           screen.socket.emit('error', {
@@ -98,5 +98,9 @@ module.exports = function (options, imports, register) {
 
 
     // Register the plugin with the system.
-  register(null, null);
+  register(null, {
+    "client" : {
+      'getScreen': getScreen
+    }
+  });
 };

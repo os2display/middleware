@@ -48,6 +48,9 @@ var config = [
     "packagePath": "./plugins/screen"
   },
   {
+    "packagePath": "./plugins/channel"
+  },
+  {
     "packagePath": "./plugins/api"
   }
 ];

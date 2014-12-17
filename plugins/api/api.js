@@ -26,49 +26,80 @@ module.exports = function (options, imports, register) {
      * Screen: deactivate.
      */
     app.delete('/api/screen/:id', function (req, res) {
+      var profile = req.user;
 
+      // Get hold of the screen.
+
+      // Remove the screen.
+
+
+      res.send(200);
     });
 
     /**
      * Screen: update.
      */
     app.put('/api/screen/:id', function (req, res) {
+      var profile = req.user;
 
+      // Get hold of the screen.
+
+      // Update the screen.
+
+      res.send(200);
     });
 
     /**
      * Screen: reload.
      */
     app.post('/api/screen/:id/reload', function (req, res) {
+      var profile = req.user;
 
+      // Get hold of the screen.
+
+      // Reload the screen.
+
+      res.send(200);
     });
 
     /**
      * Screen: stats.
      */
     app.post('/api/screen/:id/stats', function (req, res) {
+      var profile = req.user;
 
+      // Get hold of the screen.
+
+      // Get the screen stats.
+
+      res.send(200);
     });
 
     /**
      * Channel: create
      */
     app.post('/api/channel', function (req, res) {
+      var profile = req.user;
 
+      res.send(200);
     });
 
     /**
      * Channel: update
      */
     app.put('/api/channel/:id', function (req, res) {
+      var profile = req.user;
 
+      res.send(200);
     });
 
     /**
      * Channel: remove.
      */
     app.delete('/api/channel/:id', function (req, res) {
+      var profile = req.user;
 
+      res.send(200);
     });
   };
 

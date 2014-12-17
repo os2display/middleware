@@ -9,7 +9,8 @@
       "logger",
       "socket",
       "screen"
-    ]
+    ],
+    "provides": [ "client" ]
   },
   "dependencies": {
     "q": "^1.1.2"
