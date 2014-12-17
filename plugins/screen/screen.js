@@ -54,6 +54,10 @@ module.exports = function (options, imports, register) {
           deferred.resolve(self);
         }
         else {
+          /**
+           * @TODO: Is this still needed, we don't remove a screen from redis on
+           * less request by the backend.
+           */
           // Ignore self signed certificate.
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 

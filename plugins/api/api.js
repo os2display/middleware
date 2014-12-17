@@ -43,12 +43,29 @@ module.exports = function (options, imports, register) {
     this.app.delete('/api/screen/:id', function (req, res) {
       var profile = req.user;
 
-      // Get hold of the screen.
-
-      // Remove the screen.
-
-
-      res.send(200);
+      if (req.params.hasOwnProperty('id')) {
+        // Load screen.
+        var screen = new Screen(profile.apikey, req.params.id);
+        screen.load().then(
+          function (obj) {
+            obj.remove().then(
+              function () {
+                res.send(200);
+              },
+              function (error) {
+                res.send(error.message, 500);
+              }
+            );
+          },
+          function (error) {
+            res.send(error.message, 500);
+          }
+        );
+      }
+      else {
+        self.logger.error('API: missing id parameter in update screen.');
+        res.send('Missing parameters in update screen.', 500);
+      }
     });
 
     /**
@@ -63,10 +80,10 @@ module.exports = function (options, imports, register) {
         screen.load().then(
           function (obj) {
             // Set new screen properties.
-            screen.title = req.body.title;
+            obj.title = req.body.title;
 
             // Try to save the screen.
-            screen.save().then(
+            obj.save().then(
               function () {
                 res.send(200);
               },

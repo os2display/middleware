@@ -125,7 +125,7 @@ module.exports = function (options, imports, register) {
     // Get the JWT decoded token.
     var profile = socket.client.request.decoded_token;
 
-    // Log connection.
+    // Log connection event.
     logger.info('Socket: "' + profile.apikey + ':' + profile.screenID + '" connected.');
 
     // Create key to store socket under.
@@ -138,9 +138,8 @@ module.exports = function (options, imports, register) {
     socket.on('disconnect', function() {
       socketIO.remove(key);
 
-      // Log connection.
+      // Log dis-connection event.
       logger.info('Socket: "' + profile.apikey + ':' + profile.screenID + '" disconnected .');
-
     });
   });
 
