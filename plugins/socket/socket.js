@@ -98,7 +98,7 @@ SocketIO.prototype.get = function get(apikey, id) {
   "use strict";
 
   // Create key to store socket under.
-  var key = profile.apikey + ':' + profile.id;
+  var key = apikey + ':' + id;
 
   // Check if key exists.
   if (sockets.hasOwnProperty(key)) {
@@ -129,7 +129,7 @@ module.exports = function (options, imports, register) {
     logger.info('Socket: "' + profile.apikey + ':' + profile.screenID + '" connected.');
 
     // Create key to store socket under.
-    var key = profile.apikey + ':' + profile.id;
+    var key = profile.apikey + ':' + profile.screenID;
 
     // Add socket to store.
     socketIO.add(key, socket);

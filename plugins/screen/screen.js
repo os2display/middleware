@@ -140,7 +140,7 @@ module.exports = function (options, imports, register) {
       }
 
       // Inform the client/screen.
-      var socket = socket.get(self.apikey, self.id);
+      var socket = self.socket.get(self.apikey, self.id);
       if (socket) {
         socket.emit('booted', { "statusCode": 404 });
         socket.disconnect();
@@ -162,7 +162,7 @@ module.exports = function (options, imports, register) {
     var self = this;
 
     // Check that screen is connected.
-    var socket = socket.get(self.apikey, self.id);
+    var socket = self.socket.get(self.apikey, self.id);
     if (socket) {
       // Send channel/content to the screen.
       socket.emit('channelPush', data);
@@ -179,7 +179,7 @@ module.exports = function (options, imports, register) {
     var self = this;
 
     // Check that screen is connected.
-    var socket = socket.get(self.apikey, self.id);
+    var socket = self.socket.get(self.apikey, self.id);
     if (socket) {
       // Send reload command to the screen.
       socket.emit('reload');
