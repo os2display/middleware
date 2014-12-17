@@ -11,7 +11,7 @@
     "consumes": [
       "app",
       "logger",
-      "client"
+      "channel"
     ]
   }
 }

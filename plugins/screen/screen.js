@@ -21,12 +21,12 @@ module.exports = function (options, imports, register) {
     this.key = 'screen:' + apikey + ':' + id;
 
     this.title = undefined;
-    this.socket = undefined;
 
     // Injections.
     this.logger = imports.logger;
     this.cache = imports.cache;
     this.apikeys = imports.apikeys;
+    this.socket = imports.socket;
   };
 
   /**
@@ -140,8 +140,11 @@ module.exports = function (options, imports, register) {
       }
 
       // Inform the client/screen.
-      self.socket.emit('booted', { "statusCode": 404 });
-      self.socket.disconnect();
+      var socket = socket.get(self.apikey, self.id);
+      if (socket) {
+        socket.emit('booted', { "statusCode": 404 });
+        socket.disconnect();
+      }
 
       // Notify that the screen have been removed.
       deferred.resolve();
@@ -150,26 +153,36 @@ module.exports = function (options, imports, register) {
     return deferred.promise;
   };
 
+  /**
+   * Push data to the screen.
+   *
+   * @param data
+   */
   Screen.prototype.push = function push(data) {
     var self = this;
 
     // Check that screen is connected.
-    if (self.socket !== undefined) {
+    var socket = socket.get(self.apikey, self.id);
+    if (socket) {
       // Send channel/content to the screen.
-      self.socket.emit('channelPush', data);
+      socket.emit('channelPush', data);
     }
     else {
       self.logger.info('Screen: content could not be pused to "' + self.key + '" as it is not connected.');
     }
   };
 
+  /**
+   * Send reload command to the screen.
+   */
   Screen.prototype.reload = function reload() {
     var self = this;
 
     // Check that screen is connected.
-    if (self.socket !== undefined) {
+    var socket = socket.get(self.apikey, self.id);
+    if (socket) {
       // Send reload command to the screen.
-      self.socket.emit('reload');
+      socket.emit('reload');
     }
     else {
       self.logger.info('Screen: could not reload "' + self.key + '" as it is not connected.');

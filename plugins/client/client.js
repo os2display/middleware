@@ -72,11 +72,8 @@ module.exports = function (options, imports, register) {
       // Try to get the screen.
       getScreen(profile.apikey, profile.screenID).then(
         function (screen) {
-          // Set socket on the object.
-          screen.socket = socket;
-
           // Send a 200 ready code back to the client.
-          screen.socket.emit('ready', {
+          socket.emit('ready', {
             "statusCode": 200
           });
 
@@ -87,25 +84,13 @@ module.exports = function (options, imports, register) {
         },
         function (error) {
           // Send error to client.
-          screen.socket.emit('error', {
+          socket.emit('error', {
             "statusCode": 500,
             "message": error.message
           });
 
           // Log error.
           logger.error('Client: ' + error.message);
-        }
-      );
-    });
-
-    socket.on('disconnect', function() {
-      getScreen(profile.apikey, profile.screenID).then(
-        function (screen) {
-          // Remove the socket connection on the screen.
-          screen.socket = undefined;
-        },
-        function (error) {
-          logger.error('Client: disconnected screen do not exists.');
         }
       );
     });

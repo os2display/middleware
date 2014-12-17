@@ -121,14 +121,9 @@ module.exports = function (options, imports, register) {
 
   /**
    * Push channel content to screens.
-   *
-   * @returns {*}
-   *   Promise that the data will be saved.
    */
   Channel.prototype.push = function push() {
     var self = this;
-
-    var deferred = Q.defer();
 
     if (self.data !== undefined && self.screens !== undefined) {
       // Loop over screens.
@@ -145,17 +140,11 @@ module.exports = function (options, imports, register) {
             self.logger.error('Channel: screen load failed "' + error.message + '"');
           }
         );
-
-        // Always send resolved and only log errors above.
-        deferred.resolve();
       }
     }
     else {
       self.logger.error('Channel: push failed as it did not contain any information.');
-      deferred.reject(new Error('Channel did not contain any information.'));
     }
-
-    return deferred.promise;
   };
 
   /**

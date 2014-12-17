@@ -11,7 +11,8 @@
     "consumes": [
       "logger",
       "cache",
-      "apikeys"
+      "apikeys",
+      "socket"
     ]
   },
   "dependencies": {

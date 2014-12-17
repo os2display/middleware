@@ -11,21 +11,35 @@ var Q = require('q');
 module.exports = function (options, imports, register) {
   "use strict";
 
+  // Injections objects
+  var Channel = imports.channel;
+
+  /**
+   * API Object.
+   *
+   * @constructor
+   */
   var API = function () {
 
+    // Injections.
     var app = imports.app;
+    this.app = imports.app;
+    this.logger = imports.logger;
+
+    // Ref the object.
+    var self = this;
 
     /**
      * Default get request.
      */
-    app.get('/api', function (req, res) {
+    this.app.get('/api', function (req, res) {
       res.send('Please see documentation about using this api.');
     });
 
     /**
      * Screen: deactivate.
      */
-    app.delete('/api/screen/:id', function (req, res) {
+    this.app.delete('/api/screen/:id', function (req, res) {
       var profile = req.user;
 
       // Get hold of the screen.
@@ -39,7 +53,7 @@ module.exports = function (options, imports, register) {
     /**
      * Screen: update.
      */
-    app.put('/api/screen/:id', function (req, res) {
+    this.app.put('/api/screen/:id', function (req, res) {
       var profile = req.user;
 
       // Get hold of the screen.
@@ -52,7 +66,7 @@ module.exports = function (options, imports, register) {
     /**
      * Screen: reload.
      */
-    app.post('/api/screen/:id/reload', function (req, res) {
+    this.app.post('/api/screen/:id/reload', function (req, res) {
       var profile = req.user;
 
       // Get hold of the screen.
@@ -65,7 +79,7 @@ module.exports = function (options, imports, register) {
     /**
      * Screen: stats.
      */
-    app.post('/api/screen/:id/stats', function (req, res) {
+    this.app.post('/api/screen/:id/stats', function (req, res) {
       var profile = req.user;
 
       // Get hold of the screen.
@@ -78,7 +92,7 @@ module.exports = function (options, imports, register) {
     /**
      * Channel: create
      */
-    app.post('/api/channel', function (req, res) {
+    this.app.post('/api/channel', function (req, res) {
       var profile = req.user;
 
       res.send(200);
@@ -87,7 +101,7 @@ module.exports = function (options, imports, register) {
     /**
      * Channel: update
      */
-    app.put('/api/channel/:id', function (req, res) {
+    this.app.put('/api/channel/:id', function (req, res) {
       var profile = req.user;
 
       res.send(200);
@@ -96,7 +110,7 @@ module.exports = function (options, imports, register) {
     /**
      * Channel: remove.
      */
-    app.delete('/api/channel/:id', function (req, res) {
+    this.app.delete('/api/channel/:id', function (req, res) {
       var profile = req.user;
 
       res.send(200);
@@ -108,7 +122,34 @@ module.exports = function (options, imports, register) {
     app.post('/api/channel/:id/push', function (req, res) {
       var profile = req.user;
 
-      res.send(200);
+      // Validate basic data structure.
+      if (req.params.hasOwnProperty('id') && req.body.hasOwnProperty('data')) {
+        // Try to create channel.
+        var channel = new Channel(profile.apikey, req.params.id);
+        channel.data = req.body.data;
+        channel.screens = req.body.screens;
+
+        // Save channel and override if one exists.
+        channel.save().then(
+          function () {
+            // Push content.
+            channel.push();
+
+            // Log message.
+            self.logger.info('API: channel "' + channel.key + '" pushed.');
+
+            // Send response back.
+            res.send(200);
+          },
+          function (error) {
+            res.send(error.message, 500);
+          }
+        );
+      }
+      else {
+        self.logger.error('API: missing parameters in channel push.');
+        res.send('Missing parameters in channel push.', 500);
+      }
     });
   };
 
