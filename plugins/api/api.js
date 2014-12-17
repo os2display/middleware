@@ -13,6 +13,7 @@ module.exports = function (options, imports, register) {
 
   // Injections objects
   var Channel = imports.channel;
+  var Screen = imports.screen;
 
   /**
    * API Object.
@@ -69,11 +70,28 @@ module.exports = function (options, imports, register) {
     this.app.post('/api/screen/:id/reload', function (req, res) {
       var profile = req.user;
 
-      // Get hold of the screen.
-
-      // Reload the screen.
-
-      res.send(200);
+      if (req.params.hasOwnProperty('id')) {
+        // Load screen.
+        var screen = new Screen(profile.apikey, req.params.id);
+        screen.load().then(
+          function (obj) {
+            if (obj.reload()) {
+              // Reload event sent, so sent 200 back.
+              res.send(200);
+            }
+            else {
+              res.send('Screen connection could not be found.', 503);
+            }
+          },
+          function (error) {
+            res.send(error.message, 500);
+          }
+        );
+      }
+      else {
+        self.logger.error('API: missing id parameter in remove channel.');
+        res.send('Missing parameters in remove channel.', 500);
+      }
     });
 
     /**

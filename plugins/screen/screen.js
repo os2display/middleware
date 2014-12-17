@@ -194,6 +194,9 @@ module.exports = function (options, imports, register) {
 
   /**
    * Send reload command to the screen.
+   *
+   * @returns {boolean}
+   *   True if reload event is sent else false.
    */
   Screen.prototype.reload = function reload() {
     var self = this;
@@ -203,10 +206,14 @@ module.exports = function (options, imports, register) {
     if (socket) {
       // Send reload command to the screen.
       socket.emit('reload');
+
+      return true;
     }
     else {
       self.logger.info('Screen: could not reload "' + self.key + '" as it is not connected.');
     }
+
+    return false;
   };
 
   // This plugin extends the server plugin and do not provide new services.
