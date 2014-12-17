@@ -18,6 +18,7 @@ module.exports = function (options, imports, register) {
   // Injections.
   var socket = imports.socket;
   var Screen = imports.screen;
+  var logger = imports.logger;
 
   /**
    * Try to get screen information.
@@ -85,21 +86,32 @@ module.exports = function (options, imports, register) {
           // Loop over all channels and push content to the screen.
         },
         function (error) {
+          // Send error to client.
           screen.socket.emit('error', {
             "statusCode": 500,
             "message": error.message
           });
+
+          // Log error.
+          logger.error('Client: ' + error.message);
         }
       );
     });
 
     socket.on('disconnect', function() {
-
+      getScreen(profile.apikey, profile.screenID).then(
+        function (screen) {
+          // Remove the socket connection on the screen.
+          screen.socket = undefined;
+        },
+        function (error) {
+          logger.error('Client: disconnected screen do not exists.');
+        }
+      );
     });
   });
 
-
-    // Register the plugin with the system.
+  // Register the plugin with the system.
   register(null, {
     "client" : {
       'getScreen': getScreen

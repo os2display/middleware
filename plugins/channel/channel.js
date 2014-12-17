@@ -120,6 +120,7 @@ module.exports = function (options, imports, register) {
   };
 
   /**
+   * Push channel content to screens.
    *
    * @returns {*}
    *   Promise that the data will be saved.
@@ -131,7 +132,8 @@ module.exports = function (options, imports, register) {
 
     if (self.data !== undefined && self.screens !== undefined) {
       // Loop over screens.
-      for (var screenID in self.screens) {
+      for (var i in self.screens) {
+        var screenID = self.screens[i];
         // Load screen.
         var screen = new Screen(self.apikey, screenID);
         screen.load().then(
@@ -157,12 +159,23 @@ module.exports = function (options, imports, register) {
   };
 
   /**
+   * Checks if the channel has content for a given screen.
    *
+   * @param screenID
+   *   Id of the screen to search for.
+   * @returns {boolean}
+   *   True if screen was found else false.
    */
-  Channel.prototype.hasScreen = function hasScreen() {
+  Channel.prototype.hasScreen = function hasScreen(screenID) {
+    var self = this;
+    for (var i in self.screens) {
+      if (self.screens[i] === screenID) {
+        return true;
+      }
+    }
 
+    return false;
   };
-
 
   // This plugin extends the server plugin and do not provide new services.
   register(null, {

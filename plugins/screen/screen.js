@@ -165,6 +165,15 @@ module.exports = function (options, imports, register) {
 
   Screen.prototype.reload = function reload() {
     var self = this;
+
+    // Check that screen is connected.
+    if (self.socket !== undefined) {
+      // Send reload command to the screen.
+      self.socket.emit('reload');
+    }
+    else {
+      self.logger.info('Screen: could not reload "' + self.key + '" as it is not connected.');
+    }
   };
 
   // This plugin extends the server plugin and do not provide new services.
