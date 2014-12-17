@@ -17,6 +17,7 @@ module.exports = function (options, imports, register) {
 
   // Injections.
   var socket = imports.socket;
+  var Screen = imports.screen;
 
   /**
    * Try to get screen information.
@@ -37,7 +38,7 @@ module.exports = function (options, imports, register) {
     // Check if screen exists.
     if (!clients[apikey].hasOwnProperty(id)) {
       // Try to load the screen.
-      var screen = new imports.screen(apikey, id);
+      var screen = new Screen(apikey, id);
       screen.load().then(
         function () {
           // Store screen in static cache.
@@ -81,6 +82,7 @@ module.exports = function (options, imports, register) {
           /**
            * @TODO: Push content if content is ready.
            */
+          // Loop over all channels and push content to the screen.
         },
         function (error) {
           screen.socket.emit('error', {

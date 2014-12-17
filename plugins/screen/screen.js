@@ -29,6 +29,12 @@ module.exports = function (options, imports, register) {
     this.apikeys = imports.apikeys;
   };
 
+  /**
+   * Load screen.
+   *
+   * @returns {*}
+   *   Promise that the data will be saved.
+   */
   Screen.prototype.load = function load() {
     var self = this;
 
@@ -45,7 +51,7 @@ module.exports = function (options, imports, register) {
           self.title = data.title;
 
           // Notify that the screen have been loaded.
-          deferred.resolve();
+          deferred.resolve(self);
         }
         else {
           // Ignore self signed certificate.
@@ -61,7 +67,7 @@ module.exports = function (options, imports, register) {
                     self.title = body.title;
 
                     // Notify that the screen have been loaded.
-                    deferred.resolve();
+                    deferred.resolve(self);
                   }
                   else {
                     // Error getting screen form backend.
@@ -104,7 +110,7 @@ module.exports = function (options, imports, register) {
 
     imports.cache.set(self.key, JSON.stringify(data), function(err, res) {
       if (err) {
-        self.logger.error('Scree: redis encounted an error in save.');
+        self.logger.error('Screen: redis encounted an error in save.');
         deferred.reject(err);
       }
       else {
@@ -128,7 +134,7 @@ module.exports = function (options, imports, register) {
 
     self.cache.remove(self.key, function(err, res) {
       if (err) {
-        self.logger.error('Scree: redis encounted an error in remove.');
+        self.logger.error('Screen: redis encounted an error in remove.');
         deferred.reject(err);
         return;
       }
@@ -144,7 +150,7 @@ module.exports = function (options, imports, register) {
     return deferred.promise;
   };
 
-  Screen.prototype.push = function push() {
+  Screen.prototype.push = function push(data) {
 
   };
 
