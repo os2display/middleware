@@ -90,24 +90,6 @@ module.exports = function (options, imports, register) {
     });
 
     /**
-     * Channel: create
-     */
-    this.app.post('/api/channel', function (req, res) {
-      var profile = req.user;
-
-      res.send(200);
-    });
-
-    /**
-     * Channel: update
-     */
-    this.app.put('/api/channel/:id', function (req, res) {
-      var profile = req.user;
-
-      res.send(200);
-    });
-
-    /**
      * Channel: remove.
      */
     this.app.delete('/api/channel/:id', function (req, res) {
@@ -135,9 +117,9 @@ module.exports = function (options, imports, register) {
     });
 
     /**
-     * Channel: remove.
+     * Channel: create/update better known has push.
      */
-    app.post('/api/channel/:id/push', function (req, res) {
+    app.post('/api/channel/:id', function (req, res) {
       var profile = req.user;
 
       // Validate basic data structure.
