@@ -8,6 +8,9 @@
 module.exports = function (options, imports, register) {
   "use strict";
 
+  // Load promise library.
+  var Q = require('q');
+
   // Injections object.
   var Screen = imports.screen;
 
