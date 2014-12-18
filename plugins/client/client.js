@@ -29,7 +29,7 @@ module.exports = function (options, imports, register) {
     /**
      * Ready event.
      */
-    socket.on('ready', function (state) {
+    socket.on('ready', function () {
       // Try to get the screen.
       var screen = new Screen(profile.apikey, profile.screenID);
       screen.load().then(
