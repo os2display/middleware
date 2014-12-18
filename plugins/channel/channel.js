@@ -82,13 +82,22 @@ module.exports = function (options, imports, register) {
       "screens": self.screens
     };
 
-    imports.cache.set(self.key, JSON.stringify(data), function(err, res) {
+    self.cache.set(self.key, JSON.stringify(data), function(err, res) {
       if (err) {
         self.logger.error('Channel: redis encounted an error in save.');
         deferred.reject(err);
       }
       else {
-        deferred.resolve();
+        // Add channel id, so channels can be searched.
+        self.cache.addSet(self.apikey, self.id, function(err, res) {
+          if (err) {
+            self.logger.error('Channel: redis encounted an error in save set.');
+            deferred.reject(err);
+          }
+          else {
+            deferred.resolve();
+          }
+        });
       }
     });
 
@@ -102,26 +111,36 @@ module.exports = function (options, imports, register) {
     var self = this;
 
     if (self.screens !== undefined) {
+      // Remove cached channel.
       self.cache.del(self.key, function (err, res) {
         if (err) {
           self.logger.error('Channel: redis encounted an error in del channel.');
         }
         else {
-          // Find screens that displays the channel and send removed event.
-          for (var i in self.screens) {
-            var screenID = self.screens[i];
-            // Load screen.
-            var screen = new Screen(self.apikey, screenID);
-            screen.load().then(
-              function (obj) {
-                // Ask screen to push content.
-                obj.removeContent(self.id);
-              },
-              function (error) {
-                self.logger.error('Channel: screen load failed "' + error.message + '"');
-              }
-            );
-          }
+          // Remove channel from channel set.
+          self.cache.removeSet(self.apikey, self.id, function(err, res) {
+            if (err) {
+              self.logger.error('Channel: redis encounted an error in del channel set.');
+            }
+
+            // We have to continue even if there is an error above, as the
+            // cached channel have been removed. Find screens that displays the
+            // channel and send removed event.
+            for (var i in self.screens) {
+              var screenID = self.screens[i];
+              // Load screen.
+              var screen = new Screen(self.apikey, screenID);
+              screen.load().then(
+                function (obj) {
+                  // Ask screen to push content.
+                  obj.removeContent(self.id);
+                },
+                function (error) {
+                  self.logger.error('Channel: screen load failed "' + error.message + '"');
+                }
+              );
+            }
+          });
         }
       });
     }

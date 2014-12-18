@@ -8,7 +8,9 @@
     "consumes": [
       "logger",
       "socket",
-      "screen"
+      "screen",
+      "channel",
+      "cache"
     ]
   },
   "dependencies": {
