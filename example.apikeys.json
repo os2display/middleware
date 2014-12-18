@@ -1,6 +1,7 @@
 {
   "059d9d9c50e0c45b529407b183b6a02f": {
     "name": "IK3",
-    "backend": "https://service.indholdskanalen.vm"
+    "backend": "https://service.indholdskanalen.vm",
+    "expire": "300"
   }
 }
