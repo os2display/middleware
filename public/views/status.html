@@ -1,0 +1,45 @@
+<!-- Navigation bar -->
+<ng-include src="'views/navigation.html'"></ng-include>
+
+<!-- Header -->
+<div class="page-header">
+  <h1>Status <small>Stats and heartbeats</small></h1>
+</div>
+
+<!-- messages -->
+<div data-ng-show="message" class="alert {{ messageClass }}" role="alert">{{ message }}</div>
+
+<!-- Page content -->
+<div class="jumbotron">
+
+  <!-- Screens -->
+  <h3>Heartbeats</h3>
+  <div data-ng-repeat="(apikey, beats) in heartbeats">
+    <strong>APIKEY NAME</strong> <small>({{ apikey }})</small>
+    <div class="panel panel-default">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Screen</th>
+          <th>Heartbeat</th>
+        </tr>
+        </thead>
+        <tr data-ng-repeat="beat in beats">
+          <td>{{ $index + 1 }}</td>
+          <td>{{ beat.title }}</td>
+          <td>{{ beat.heartbeat * 1000 | date:'dd/MM/yy HH:mm:ss' }}</td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <button type="button" class="btn btn-success btn-xs" data-ng-click="refreshBeats()">
+    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh
+  </button>
+
+
+  <!-- Channels in redis -->
+  <h3>Channels</h3>
+  ...
+</div>

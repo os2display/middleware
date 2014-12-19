@@ -9,14 +9,17 @@
  * @param app
  * @param logger
  * @param apikeys
+ * @param cache
+ * @param Screen
  *
  * @constructor
  */
-var Admin = function Admin(app, logger, apikeys) {
+var Admin = function Admin(app, logger, apikeys, cache, Screen) {
   "use strict";
 
   var self = this;
   this.logger = logger;
+  this.cache = cache;
 
   /**
    * Default get request.
@@ -144,7 +147,67 @@ var Admin = function Admin(app, logger, apikeys) {
       res.send('You do not have the right role.', 401);
     }
   });
+
+  /**
+   * Get all heartbeats.
+   */
+  app.get('/api/admin/heartbeats', function (req, res) {
+    if (self.validateCall(req)) {
+      apikeys.load().then(
+        function (keys) {
+          var heartbeats = {};
+          for (var apikey in keys) {
+            self.cache.membersOfSet('screen:' + apikey, function (err, screens) {
+              if (err) {
+                self.logger.error(err.message);
+              }
+              else {
+                heartbeats[apikey] = [];
+
+                var len = screens.length;
+                for (var i in screens) {
+                  var screen = new Screen(apikey, screens[i]);
+                  screen.load().then(
+                    function (screenObj) {
+                      heartbeats[apikey].push({
+                        "title": screenObj.title,
+                        "heartbeat": screenObj.heartbeat
+                      });
+
+                      // When to return the data.
+                      if ((Number(i) + 1) === len) {
+                        // This api key's screens are done. So remove the key from
+                        // the array.
+                        delete keys[apikey];
+
+                        // Check if any more api key groups exists.
+                        if (!Object.keys(keys).length) {
+                          // All screens inside all api keys have been loaded, so
+                          // lets return the content.
+                          res.send(heartbeats);
+                        }
+                      }
+                    },
+                    function (error) {
+                      self.logger.error(error.message);
+                    }
+                  );
+                }
+              }
+            });
+          }
+        }, function (error) {
+          res.send(error.message, 500);
+        }
+      );
+
+    }
+    else {
+      res.send('You do not have the right role.', 401);
+    }
+  });
 };
+
 
 /**
  * Validate that the role is admin.
@@ -165,7 +228,7 @@ module.exports = function (options, imports, register) {
   "use strict";
 
   // Create the API routes using the API object.
-  var admin = new Admin(imports.app, imports.logger, imports.apikeys);
+  var admin = new Admin(imports.app, imports.logger, imports.apikeys, imports.cache, imports.screen);
 
   // This plugin extends the server plugin and do not provide new services.
   register(null, null);

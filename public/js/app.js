@@ -48,6 +48,10 @@ app.config(['$routeProvider', '$locationProvider', '$httpProvider',
         templateUrl: 'views/apikeys.html',
         controller: 'ApiKeysController'
       })
+      .when('/status', {
+        templateUrl: 'views/status.html',
+        controller: 'StatusController'
+      })
       .when('/logout', {
         templateUrl: 'views/logout.html',
         controller: 'LogoutController'

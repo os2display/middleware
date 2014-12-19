@@ -236,3 +236,37 @@ app.controller('ApiKeysController', ['$scope', '$window', '$location', 'ngOverla
     loadApikeys();
   }
 ]);
+
+/**
+* API keys page.
+*/
+app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay', 'dataService',
+  function($scope, $window, $location, ngOverlay, dataService) {
+    "use strict";
+
+    /**
+     * Helper function to load heartbeats from the backend.
+     */
+    function getHeartbeats () {
+      dataService.fetch('get', '/api/admin/heartbeats').then(
+        function (data) {
+          $scope.heartbeats = data;
+        },
+        function (reason) {
+          $scope.message = reason.message;
+          $scope.messageClass = 'alert-danger';
+        }
+      );
+    }
+
+    /**
+     * Refresh callback.
+     */
+    $scope.refreshBeats = function refreshBeats() {
+      getHeartbeats();
+    };
+
+    // Get the controller up and running.
+    getHeartbeats();
+  }
+]);
