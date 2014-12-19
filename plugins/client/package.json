@@ -1,0 +1,19 @@
+{
+  "name": "Client",
+  "description": "Socket client communication with the client (frontend)",
+  "version": "0.0.1",
+  "main": "client.js",
+  "private": true,
+  "plugin": {
+    "consumes": [
+      "logger",
+      "socket",
+      "screen",
+      "channel",
+      "cache"
+    ]
+  },
+  "dependencies": {
+    "q": "^1.1.2"
+  }
+}

@@ -1,41 +1,19 @@
 {
-  "sitename": "Beta test",
-  "port": 3000,
-
-  // Configuration of ssl connection. Default disabled.
-  "ssl": {
-    "active": false,
-    "key": "ssl/server.key",
-    "cert": "ssl/server.cert",
-    "ca": false
+  "port": 3020,
+  "secret": "MySuperSecret",
+  "log": {
+    "file": "messages.log",
+    "debug": false
   },
-
-  // Secret key used to sign authentication tokens.
-  "secret": "THIS IS THE SUPER SECRET KEY",
-
-  // Debug activation and log level (1 prod, 10 devel).
-  "debug": false,
-  "log_level": 1,
-
-  // Middleware application maintenance login.
-  "maintenance": {
+  "admin": {
     "username": "admin",
-    "password": "password"
+    "password": "admin"
   },
-
-  // Redis configuration.
   "cache": {
     "port": "6379",
     "host": "localhost",
     "auth": null,
-    "db": 1
+    "db": 0
   },
-
-  // Backend location and the IP allowed to connect to this application.
-  "backend": {
-    "host": "127.0.0.1",
-    "ip": "127.0.0.1",
-    "port": "443"
-  },
-  "log": "middelware.log"
+  "apikeys": "apikeys.json"
 }
