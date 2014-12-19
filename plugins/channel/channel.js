@@ -21,6 +21,7 @@ module.exports = function (options, imports, register) {
     this.key = 'channel:' + apikey + ':' + id;
 
     // Channel properties.
+    this.title = undefined;
     this.data = undefined;
     this.screens = undefined;
 
@@ -49,6 +50,7 @@ module.exports = function (options, imports, register) {
       else {
         if (res !== null) {
           var data = JSON.parse(res);
+          self.title = data.title;
           self.data = data.data;
           self.screens = data.screens;
 
@@ -78,6 +80,7 @@ module.exports = function (options, imports, register) {
 
     // Information to store in redis.
     var data = {
+      "title": self.title,
       "data": self.data,
       "screens": self.screens
     };

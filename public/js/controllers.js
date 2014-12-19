@@ -255,7 +255,7 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
           $scope.apikeys = data;
 
           // Load heartbeats.
-          dataService.fetch('get', '/api/admin/heartbeats').then(
+          dataService.fetch('get', '/api/admin/status/heartbeats').then(
             function (data) {
               $scope.heartbeats = data;
             },
@@ -273,13 +273,39 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
     }
 
     /**
-     * Refresh callback.
+     * Load channels.
+     *
+     * @TODO: Refactor this with the getHeartbeats and get api keys.
+     */
+    function getChannels() {
+      // Load heartbeats.
+      dataService.fetch('get', '/api/admin/status/channels').then(
+        function (data) {
+          $scope.channels = data;
+        },
+        function (reason) {
+          $scope.message = reason.message;
+          $scope.messageClass = 'alert-danger';
+        }
+      );
+    }
+
+    /**
+     * Refresh heartbeats callback.
      */
     $scope.refreshBeats = function refreshBeats() {
       getHeartbeats();
     };
 
+    /**
+     * Refresh channels callback.
+     */
+    $scope.refreshChannels = function refreshChannels() {
+      getChannels();
+    };
+
     // Get the controller up and running.
     getHeartbeats();
+    getChannels();
   }
 ]);

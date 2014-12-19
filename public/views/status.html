@@ -21,12 +21,14 @@
         <thead>
         <tr>
           <th>#</th>
+          <th>Id</th>
           <th>Screen</th>
           <th>Heartbeat</th>
         </tr>
         </thead>
         <tr data-ng-repeat="beat in beats">
           <td>{{ $index + 1 }}</td>
+          <td>{{ beat.id }}</td>
           <td>{{ beat.title }}</td>
           <td>{{ beat.heartbeat * 1000 | date:'dd/MM/yy HH:mm:ss' }}</td>
           <td></td>
@@ -41,5 +43,29 @@
 
   <!-- Channels in redis -->
   <h3>Channels</h3>
-  ...
+  <div data-ng-repeat="(apikey, info) in channels">
+    <strong>{{ apikeys[apikey].name }}</strong> <small>({{ apikey }} - <a href="{{ apikeys[apikey].backend }}" target="_blank">{{ apikeys[apikey].backend }}</a>)</small>
+    <div class="panel panel-default">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Id</th>
+          <th>Title</th>
+          <th>No. screens</th>
+        </tr>
+        </thead>
+        <tr data-ng-repeat="channel in info">
+          <td>{{ $index + 1 }}</td>
+          <td>{{ channel.id }}</td>
+          <td>{{ channel.title }}</td>
+          <td>{{ channel.screens }}</td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <button type="button" class="btn btn-success btn-xs" data-ng-click="refreshChannels()">
+    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh
+  </button>
 </div>

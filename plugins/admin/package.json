@@ -10,7 +10,8 @@
       "logger",
       "apikeys",
       "cache",
-      "screen"
+      "screen",
+      "channel"
     ]
   }
 }
