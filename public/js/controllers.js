@@ -248,9 +248,22 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
      * Helper function to load heartbeats from the backend.
      */
     function getHeartbeats () {
-      dataService.fetch('get', '/api/admin/heartbeats').then(
+      // Start by loading API keys to ensure contextual information is
+      // available.
+      dataService.fetch('get', '/api/admin/keys').then(
         function (data) {
-          $scope.heartbeats = data;
+          $scope.apikeys = data;
+
+          // Load heartbeats.
+          dataService.fetch('get', '/api/admin/heartbeats').then(
+            function (data) {
+              $scope.heartbeats = data;
+            },
+            function (reason) {
+              $scope.message = reason.message;
+              $scope.messageClass = 'alert-danger';
+            }
+          );
         },
         function (reason) {
           $scope.message = reason.message;

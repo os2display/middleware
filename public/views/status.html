@@ -15,7 +15,7 @@
   <!-- Screens -->
   <h3>Heartbeats</h3>
   <div data-ng-repeat="(apikey, beats) in heartbeats">
-    <strong>APIKEY NAME</strong> <small>({{ apikey }})</small>
+    <strong>{{ apikeys[apikey].name }}</strong> <small>({{ apikey }} - <a href="{{ apikeys[apikey].backend }}" target="_blank">{{ apikeys[apikey].backend }}</a>)</small>
     <div class="panel panel-default">
       <table class="table table-hover">
         <thead>
