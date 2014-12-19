@@ -21,6 +21,7 @@ module.exports = function (options, imports, register) {
     this.key = 'screen:' + apikey + ':' + id;
 
     this.title = undefined;
+    this.heartbeat = undefined;
 
     // Injections.
     this.logger = imports.logger;
@@ -49,6 +50,7 @@ module.exports = function (options, imports, register) {
         if (res !== null) {
           var data = JSON.parse(res);
           self.title = data.title;
+          self.heartbeat = data.heartbeat;
 
           // Notify that the screen have been loaded.
           deferred.resolve(self);
@@ -109,7 +111,8 @@ module.exports = function (options, imports, register) {
 
     // Information to store in redis.
     var data = {
-      title: self.title
+      title: self.title,
+      heartbeat: self.heartbeat
     };
 
     imports.cache.set(self.key, JSON.stringify(data), function(err, res) {
@@ -118,7 +121,16 @@ module.exports = function (options, imports, register) {
         deferred.reject(err);
       }
       else {
-        deferred.resolve();
+        // Add channel id, so channels can be searched.
+        self.cache.addSet('screen:' + self.apikey, self.id, function(err, res) {
+          if (err) {
+            self.logger.error('Channel: redis encounted an error in save set.');
+            deferred.reject(err);
+          }
+          else {
+            deferred.resolve();
+          }
+        });
       }
     });
 
@@ -140,18 +152,25 @@ module.exports = function (options, imports, register) {
       if (err) {
         self.logger.error('Screen: redis encounted an error in remove.');
         deferred.reject(err);
-        return;
       }
+      else {
+        self.cache.removeSet('screen:' + self.apikey, self.id, function (err, res) {
+          if (err) {
+            self.logger.error('Screen: redis encounted an error in del screen set.');
+          }
 
-      // Inform the client/screen.
-      var socket = self.socket.get(self.apikey, self.id);
-      if (socket) {
-        socket.emit('booted', { "statusCode": 404 });
-        socket.disconnect();
+          // We do send the booted event even if the above error is logged as
+          // the screen have be removed.
+          var socket = self.socket.get(self.apikey, self.id);
+          if (socket) {
+            socket.emit('booted', {"statusCode": 404});
+            socket.disconnect();
+          }
+
+          // Notify that the screen have been removed.
+          deferred.resolve();
+        });
       }
-
-      // Notify that the screen have been removed.
-      deferred.resolve();
     });
 
     return deferred.promise;

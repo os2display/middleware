@@ -44,7 +44,7 @@ module.exports = function (options, imports, register) {
 
               // Load all channels with the clients api key to see if they have
               // content for the channel.
-              cache.membersOfSet(profile.apikey, function(err, channels) {
+              cache.membersOfSet('channel:' + profile.apikey, function(err, channels) {
                 if (err) {
                   socket.emit('error', {
                     "statusCode": 500,
@@ -75,12 +75,6 @@ module.exports = function (options, imports, register) {
                   }
                 }
               });
-
-              /**
-               * @TODO: Push content if content is ready.
-               *
-               * Loop over all channels and push content to the screen.
-               */
             },
             function (error) {
               // Send error to client.
@@ -100,6 +94,24 @@ module.exports = function (options, imports, register) {
 
           // Log error.
           logger.error('Client: ' + error.message);
+        }
+      );
+    });
+
+    /**
+     * Heartbeat event.
+     *
+     * Handle heartbeat event used to check that the screen are alive.
+     */
+    socket.conn.on('heartbeat', function heartbeat() {
+      var screen = new Screen(profile.apikey, profile.screenID);
+      screen.load().then(
+        function (screenObj) {
+          screenObj.heartbeat = Math.round((new Date()).getTime() / 1000);
+          screenObj.save();
+        },
+        function (error) {
+          logger.info('Client: unable to load screen to set heartbeat.');
         }
       );
     });

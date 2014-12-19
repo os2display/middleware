@@ -89,7 +89,7 @@ module.exports = function (options, imports, register) {
       }
       else {
         // Add channel id, so channels can be searched.
-        self.cache.addSet(self.apikey, self.id, function(err, res) {
+        self.cache.addSet('channel:' + self.apikey, self.id, function(err, res) {
           if (err) {
             self.logger.error('Channel: redis encounted an error in save set.');
             deferred.reject(err);
@@ -118,7 +118,7 @@ module.exports = function (options, imports, register) {
         }
         else {
           // Remove channel from channel set.
-          self.cache.removeSet(self.apikey, self.id, function(err, res) {
+          self.cache.removeSet('channel:' + self.apikey, self.id, function(err, res) {
             if (err) {
               self.logger.error('Channel: redis encounted an error in del channel set.');
             }
