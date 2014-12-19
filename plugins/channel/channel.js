@@ -133,7 +133,7 @@ module.exports = function (options, imports, register) {
               screen.load().then(
                 function (obj) {
                   // Ask screen to push content.
-                  obj.removeContent(self.id);
+                  obj.removeChannel(self.id);
                 },
                 function (error) {
                   self.logger.error('Channel: screen load failed "' + error.message + '"');

@@ -147,6 +147,57 @@ module.exports = function (options, imports, register) {
     });
 
     /**
+     * Channel: remove channel from one screen only.
+     *
+     * This is done by loading the channel and remove the screen from screens
+     * inside the channel. Then save the channel and load the screen and send
+     * removeChannel event to the client.
+     */
+    this.app.delete('/api/channel/:channelId/screen/:screenId', function (req, res) {
+      var profile = req.user;
+
+      if (req.params.hasOwnProperty('channelId') && req.params.hasOwnProperty('screenId')) {
+
+        // Get parameters.
+        var screenId = req.params.screenId;
+        var channelId = req.params.channelId;
+
+        // Try to load channels.
+        var channel = new Channel(profile.apikey, channelId);
+        channel.load().then(
+          function (channelObj) {
+            // Remove screen from channel.
+            var index = channelObj.screens.indexOf(screenId);
+            delete channelObj.screens[index];
+
+            // Save channel.
+            channelObj.save().then(
+              function () {
+                // Load screen and send remove channel.
+                var screen = new Screen(profile.apikey, screenId);
+                screen.removeChannel(channelId);
+
+                // Send response back that we have send the event to the client.
+                res.send(200);
+              },
+              function (error) {
+                self.logger.error('API: channel not saved in delete screen.');
+                res.send(error.message, 500);
+              }
+            );
+          },
+          function (error) {
+            res.send(error.message, 500);
+          }
+        );
+      }
+      else {
+        self.logger.error('API: missing id parameter in remove channel.');
+        res.send('Missing parameters in remove channel.', 500);
+      }
+    });
+
+    /**
      * Channel: remove.
      */
     this.app.delete('/api/channel/:id', function (req, res) {

@@ -201,7 +201,7 @@ module.exports = function (options, imports, register) {
    * @param channelId
    *   Id of the channel to remove.
    */
-  Screen.prototype.removeContent = function removeContent(channelId) {
+  Screen.prototype.removeChannel = function removeChannel(channelId) {
     var self = this;
 
     // Check that screen is connected.
