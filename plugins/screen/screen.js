@@ -22,6 +22,8 @@ module.exports = function (options, imports, register) {
 
     this.title = undefined;
     this.heartbeat = undefined;
+    this.options = undefined;
+    this.template = undefined;
 
     // Injections.
     this.logger = imports.logger;
@@ -51,6 +53,8 @@ module.exports = function (options, imports, register) {
           var data = JSON.parse(res);
           self.title = data.title;
           self.heartbeat = data.heartbeat;
+          self.options = data.options;
+          self.template = data.template;
 
           // Notify that the screen have been loaded.
           deferred.resolve(self);
@@ -71,6 +75,8 @@ module.exports = function (options, imports, register) {
                 if (!error) {
                   if (response.statusCode === 200) {
                     self.title = body.title;
+                    self.options = body.options;
+                    self.template = body.template;
 
                     // Notify that the screen have been loaded.
                     deferred.resolve(self);
@@ -112,7 +118,9 @@ module.exports = function (options, imports, register) {
     // Information to store in redis.
     var data = {
       title: self.title,
-      heartbeat: self.heartbeat
+      heartbeat: self.heartbeat,
+      options: self.options,
+      template: self.template
     };
 
     imports.cache.set(self.key, JSON.stringify(data), function(err, res) {

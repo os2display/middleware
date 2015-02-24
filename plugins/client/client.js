@@ -39,7 +39,12 @@ module.exports = function (options, imports, register) {
             function () {
               // Send a 200 ready code back to the client.
               socket.emit('ready', {
-                "statusCode": 200
+                "statusCode": 200,
+                "screen": {
+                  "id": screenObj.id,
+                  "options": screenObj.options,
+                  "template": screenObj.template
+                }
               });
 
               // Load all channels with the clients api key to see if they have
@@ -61,8 +66,19 @@ module.exports = function (options, imports, register) {
                       function (channelObj) {
                         // Check if channel has the screen.
                         if (channelObj.hasScreen(profile.screenID)) {
+                          // Ask screen to push content.
+                          var regions = [];
+                          for (var j = 0; j < channelObj.regions.length; j++) {
+                            if (channelObj.regions[j].screen === screenObj.id) {
+                              regions.push(channelObj.regions[j].region);
+                            }
+                          }
+
                           // Send channel content to the current screen.
-                          screenObj.push(channelObj.data);
+                          screenObj.push({
+                            "regions": regions,
+                            "data": channelObj.data
+                          });
                         }
                       },
                       function (error) {

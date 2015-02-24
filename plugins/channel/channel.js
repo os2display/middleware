@@ -24,6 +24,7 @@ module.exports = function (options, imports, register) {
     this.title = undefined;
     this.data = undefined;
     this.screens = undefined;
+    this.regions = undefined;
 
     // Injections.
     this.logger = imports.logger;
@@ -53,6 +54,7 @@ module.exports = function (options, imports, register) {
           self.title = data.title;
           self.data = data.data;
           self.screens = data.screens;
+          self.regions = data.regions;
 
           // Notify that the channel have been loaded.
           deferred.resolve(self);
@@ -82,7 +84,8 @@ module.exports = function (options, imports, register) {
     var data = {
       "title": self.title,
       "data": self.data,
-      "screens": self.screens
+      "screens": self.screens,
+      "regions": self.regions
     };
 
     self.cache.set(self.key, JSON.stringify(data), function(err, res) {
@@ -166,8 +169,19 @@ module.exports = function (options, imports, register) {
         var screen = new Screen(self.apikey, screenID);
         screen.load().then(
           function (obj) {
+            // Find which regions of the screen to push to.
+            var regions = [];
+            for (var j = 0; j < self.regions.length; j++) {
+              if (self.regions[j].screen === obj.id) {
+                regions.push(self.regions[j].region);
+              }
+            }
+
             // Ask screen to push content.
-            obj.push(self.data);
+            obj.push({
+              "regions": regions,
+              "data": self.data
+            });
           },
           function (error) {
             self.logger.error('Channel: screen load failed "' + error.message + '"');
