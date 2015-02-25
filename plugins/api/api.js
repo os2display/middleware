@@ -82,6 +82,7 @@ module.exports = function (options, imports, register) {
             // Set new screen properties.
             obj.title = req.body.title;
             obj.options = req.body.options;
+            obj.template = req.body.template;
 
             // Try to save the screen.
             obj.save().then(
