@@ -164,57 +164,50 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
    * load an first sent back response when all data have been acquired from the
    * different stores (filesystem and cache).
    */
-  app.get('/api/admin/status/heartbeats', function (req, res) {
+  app.get('/api/admin/status/heartbeats/:apikey', function (req, res) {
     if (self.validateCall(req)) {
-      apikeys.load().then(
-        function (keys) {
-          var heartbeats = {};
-          for (var apikey in keys) {
-            self.cache.membersOfSet('screen:' + apikey, function (err, screens) {
-              if (err) {
-                self.logger.error(err.message);
-              }
-              else {
-                heartbeats[apikey] = [];
+      var apikey = req.params.apikey;
+      var data = {
+        "apikey": apikey,
+        "beats": []
+      };
 
-                var len = screens.length;
-                for (var i in screens) {
-                  var screen = new Screen(apikey, screens[i]);
-                  screen.load().then(
-                    function (screenObj) {
-                      heartbeats[apikey].push({
-                        "id": screenObj.id,
-                        "title": screenObj.title,
-                        "heartbeat": screenObj.heartbeat
-                      });
-
-                      // When to return the data.
-                      if ((Number(i) + 1) === len) {
-                        // This api key's screens are done. So remove the key from
-                        // the array.
-                        delete keys[apikey];
-
-                        // Check if any more api key groups exists.
-                        if (!Object.keys(keys).length) {
-                          // All screens inside all api keys have been loaded, so
-                          // lets return the content.
-                          res.send(heartbeats);
-                        }
-                      }
-                    },
-                    function (error) {
-                      self.logger.error(error.message);
-                    }
-                  );
-                }
-              }
-            });
-          }
-        }, function (error) {
-          res.send(error.message, 500);
+      self.cache.membersOfSet('screen:' + apikey, function (err, screens) {
+        if (err) {
+          self.logger.error(err.message);
         }
-      );
+        else {
+          var len = screens.length;
 
+          // Check if any screens are active on for the api key.
+          if (!len) {
+            res.send(data);
+          }
+
+          // Loop over screens.
+          for (var i in screens) {
+            var screen = new Screen(apikey, screens[i]);
+            screen.load().then(
+              function (screenObj) {
+                data.beats.push({
+                  "id": screenObj.id,
+                  "title": screenObj.title,
+                  "heartbeat": screenObj.heartbeat
+                });
+
+                // When to return the data.
+                if ((Number(i) + 1) === len) {
+                  // All screens have been loaded.
+                  res.send(data);
+                }
+              },
+              function (error) {
+                self.logger.error(error.message);
+              }
+            );
+          }
+        }
+      });
     }
     else {
       res.send('You do not have the right role.', 401);
@@ -229,57 +222,51 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
    *
    * @see /api/admin/status/heartbeats
    */
-  app.get('/api/admin/status/channels', function (req, res) {
+  app.get('/api/admin/status/channels/:apikey', function (req, res) {
     if (self.validateCall(req)) {
-      apikeys.load().then(
-        function (keys) {
-          var info = {};
+      var apikey = req.params.apikey;
+      var data = {
+        "apikey": apikey,
+        "channels": []
+      };
 
-          for (var apikey in keys) {
-            self.cache.membersOfSet('channel:' + apikey, function (err, channels) {
-              if (err) {
-                self.logger.error(err.message);
-              }
-              else {
-                info[apikey] = [];
-
-                var len = channels.length;
-                for (var i in channels) {
-                  var channel = new Channel(apikey, channels[i]);
-                  channel.load().then(
-                    function (channelObj) {
-                      info[apikey].push({
-                        "id": channelObj.id,
-                        "title": channelObj.title,
-                        "screens": channelObj.screens.length
-                      });
-
-                      // When to return the data.
-                      if ((Number(i) + 1) === len) {
-                        // This api key's channels are done. So remove the key from
-                        // the array.
-                        delete keys[apikey];
-
-                        // Check if any more api key groups exists.
-                        if (!Object.keys(keys).length) {
-                          // All channels inside all api keys have been loaded, so
-                          // lets return the content.
-                          res.send(info);
-                        }
-                      }
-                    },
-                    function (error) {
-                      self.logger.error(error.message);
-                    }
-                  );
-                }
-              }
-            });
-          }
-        }, function (error) {
-          res.send(error.message, 500);
+      self.cache.membersOfSet('channel:' + apikey, function (err, channels) {
+        if (err) {
+          self.logger.error(err.message);
         }
-      );
+        else {
+          var len = channels.length;
+
+          // Check if any channels are available for the api key.
+          if (!len) {
+            res.send(data);
+          }
+
+          // Loop over channels.
+          for (var i in channels) {
+            var channel = new Channel(apikey, channels[i]);
+            channel.load().then(
+              function (channelObj) {
+                data.channels.push({
+                  "id": channelObj.id,
+                  "title": channelObj.title,
+                  "screens": channelObj.screens.length
+                });
+
+                // When to return the data.
+                if ((Number(i) + 1) === len) {
+                  // All channels have been loaded.
+                  res.send(data);
+                }
+              },
+              function (error) {
+                self.logger.error(error.message);
+              }
+            );
+          }
+        }
+      });
+
     }
     else {
       res.send('You do not have the right role.', 401);
