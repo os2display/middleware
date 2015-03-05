@@ -171,9 +171,11 @@ module.exports = function (options, imports, register) {
           function (obj) {
             // Find which regions of the screen to push to.
             var regions = [];
-            for (var j = 0; j < self.regions.length; j++) {
-              if (self.regions[j].screen === obj.id) {
-                regions.push(self.regions[j].region);
+            if (self.regions !== undefined) {
+              for (var j = 0; j < self.regions.length; j++) {
+                if (self.regions[j].screen === obj.id) {
+                  regions.push(self.regions[j].region);
+                }
               }
             }
 

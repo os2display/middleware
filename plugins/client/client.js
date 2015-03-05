@@ -37,7 +37,8 @@ module.exports = function (options, imports, register) {
           screenObj.title = profile.screenTitle;
           screenObj.save().then(
             function () {
-              // Send a 200 ready code back to the client.
+              // Send a 200 ready code back to the client with information about
+              // template and options.
               socket.emit('ready', {
                 "statusCode": 200,
                 "screen": {
@@ -53,7 +54,7 @@ module.exports = function (options, imports, register) {
                 if (err) {
                   socket.emit('error', {
                     "statusCode": 500,
-                    "message": error.message
+                    "message": err.message
                   });
                 }
                 else {
