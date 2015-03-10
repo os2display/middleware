@@ -81,6 +81,8 @@ module.exports = function (options, imports, register) {
           function (obj) {
             // Set new screen properties.
             obj.title = req.body.title;
+            obj.options = req.body.options;
+            obj.template = req.body.template;
 
             // Try to save the screen.
             obj.save().then(
@@ -236,6 +238,7 @@ module.exports = function (options, imports, register) {
         var channel = new Channel(profile.apikey, req.params.id);
         channel.data = req.body.data;
         channel.screens = req.body.screens;
+        channel.regions = req.body.regions;
 
         // Save channel and override if one exists.
         channel.save().then(
