@@ -14,6 +14,9 @@ module.exports = function (options, imports, register) {
   var client = new raven.Client('https://a8703133ddc845b09f99d1f03c0b0db8@app.getsentry.com/41301');
   client.patchGlobal();
 
+  // Send message that middleware have been loaded.
+  client.captureMessage('The middleware have been laoded.');
+
   logger.info('Start the sentry connection.');
 
   // Register exposed function with architect.
