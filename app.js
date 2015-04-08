@@ -55,6 +55,9 @@ var config = [
   },
   {
     "packagePath": "./plugins/api"
+  },
+  {
+    "packagePath": "./plugins/sentry"
   }
 ];
 
