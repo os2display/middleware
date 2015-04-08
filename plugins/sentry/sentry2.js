@@ -11,7 +11,7 @@ module.exports = function (options, imports, register) {
   var raven = require('raven');
 
   // Connect to sentry server and send all exceptions.
-  var client = new raven.Client('https://a8703133ddc845b09f99d1f03c0b0db8@app.getsentry.com/41301');
+  var client = new raven.Client(options.url);
   client.patchGlobal();
 
   // Send message that middleware have been loaded.

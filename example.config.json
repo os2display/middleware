@@ -15,5 +15,6 @@
     "auth": null,
     "db": 0
   },
-  "apikeys": "apikeys.json"
+  "apikeys": "apikeys.json",
+  "sentryUrl": "https://xxx:xxx@app.getsentry.com/xxx"
 }
