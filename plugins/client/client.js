@@ -43,6 +43,7 @@ module.exports = function (options, imports, register) {
                 "statusCode": 200,
                 "screen": {
                   "id": screenObj.id,
+                  "title": screenObj.title,
                   "options": screenObj.options,
                   "template": screenObj.template
                 }
