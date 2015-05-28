@@ -1,0 +1,21 @@
+{
+  "name": "Channel",
+  "description": "Channel objects",
+  "version": "0.0.1",
+  "main": "channel.js",
+  "private": true,
+  "plugin": {
+    "provides": [
+      "channel"
+    ],
+    "consumes": [
+      "logger",
+      "cache",
+      "apikeys",
+      "screen"
+    ]
+  },
+  "dependencies": {
+    "q": "^1.1.2"
+  }
+}
