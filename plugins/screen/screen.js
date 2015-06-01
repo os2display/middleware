@@ -70,7 +70,7 @@ module.exports = function (options, imports, register) {
           self.apikeys.get(self.apikey).then(
             function (info) {
               // Call backend to get screen information.
-              var client = request.newClient(info.backend);
+              var client = request.createClient(info.backend);
               client.post('api/screen/get', { "id": self.id }, function(error, response, body) {
                 if (!error) {
                   if (response.statusCode === 200) {
