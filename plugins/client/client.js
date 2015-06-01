@@ -104,14 +104,14 @@ module.exports = function (options, imports, register) {
           );
         },
         function (error) {
+          // Log error.
+          logger.error('Client: ' + error.message);
+
           // Send error to client.
           socket.emit('error', {
             "statusCode": 500,
             "message": error.message
           });
-
-          // Log error.
-          logger.error('Client: ' + error.message);
         }
       );
     });

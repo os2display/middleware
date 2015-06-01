@@ -82,12 +82,12 @@ module.exports = function (options, imports, register) {
                     deferred.resolve(self);
                   }
                   else {
-                    // Error getting screen form backend.
-                    deferred.reject(new Error('No 200 code come back from the server.'));
+                    // Error getting screen from backend.
+                    deferred.reject(new Error('Backend send code: ' + response.statusCode + ' for screen id: ' + self.id));
                   }
                 }
                 else {
-                  // Error getting screen form backend.
+                  // Error getting screen from backend.
                   deferred.reject(error);
                 }
               });
