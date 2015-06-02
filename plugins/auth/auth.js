@@ -55,7 +55,7 @@ module.exports = function (options, imports, register) {
             res.json({'token': token});
           }
           else {
-            res.send('API key could not be validated.', 401);
+            res.status(401).send('API key could not be validated.');
           }
         },
         function (error) {
@@ -70,7 +70,7 @@ module.exports = function (options, imports, register) {
    */
   app.post('/login', function (req, res, next) {
     if (!req.body.hasOwnProperty('username') || !req.body.hasOwnProperty('password')) {
-      res.send("Credentials not found in the request.", 404);
+      res.status(404).send("Credentials not found in the request.");
     }
     else {
       if (req.body.username == options.admin.username && req.body.password == options.admin.password) {
@@ -85,7 +85,7 @@ module.exports = function (options, imports, register) {
         });
       }
       else {
-        res.send('Credentials could not be validated.', 401);
+        res.status(401).send('Credentials could not be validated.');
       }
     }
   });
@@ -110,7 +110,7 @@ module.exports = function (options, imports, register) {
       imports.apikeys.get(apikey).then(
         function (info) {
           // Call backend to get screen information.
-          var client = request.newClient(info.backend);
+          var client = request.createClient(info.backend);
           client.post('api/screen/activate', data, function(error, response, body) {
             if (!error) {
               if (response.statusCode === 200) {
@@ -130,22 +130,22 @@ module.exports = function (options, imports, register) {
                 res.json({token: token});
               }
               else {
-                res.send('Activation code could not be validated.', response.statusCode);
+                res.status(response.statusCode).send('Activation code could not be validated.');
               }
             }
             else {
               // Activation failed, so send error message back to the client.
-              res.send(error.message, 500);
+              res.status(500).send(error.message);
             }
           });
         },
         function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('Activation code could not be validated.', 401);
+      res.status(401).send('Activation code could not be validated.');
     }
   });
 

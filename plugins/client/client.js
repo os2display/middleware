@@ -43,6 +43,7 @@ module.exports = function (options, imports, register) {
                 "statusCode": 200,
                 "screen": {
                   "id": screenObj.id,
+                  "title": screenObj.title,
                   "options": screenObj.options,
                   "template": screenObj.template
                 }
@@ -103,14 +104,14 @@ module.exports = function (options, imports, register) {
           );
         },
         function (error) {
+          // Log error.
+          logger.error('Client: ' + error.message);
+
           // Send error to client.
           socket.emit('error', {
             "statusCode": 500,
             "message": error.message
           });
-
-          // Log error.
-          logger.error('Client: ' + error.message);
         }
       );
     });

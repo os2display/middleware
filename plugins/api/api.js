@@ -50,7 +50,7 @@ module.exports = function (options, imports, register) {
           function (obj) {
             obj.remove().then(
               function () {
-                res.send(200);
+                res.sendStatus(200);
               },
               function (error) {
                 res.send(error.message, 500);
@@ -87,7 +87,7 @@ module.exports = function (options, imports, register) {
             // Try to save the screen.
             obj.save().then(
               function () {
-                res.send(200);
+                res.sendStatus(200);
               },
               function (error) {
                 res.send(error.message, 500);
@@ -118,7 +118,7 @@ module.exports = function (options, imports, register) {
           function (obj) {
             if (obj.reload()) {
               // Reload event sent, so sent 200 back.
-              res.send(200);
+              res.sendStatus(200);
             }
             else {
               res.send('Screen connection could not be found.', 503);
@@ -145,7 +145,7 @@ module.exports = function (options, imports, register) {
 
       // Get the screen stats.
 
-      res.send(200);
+      res.sendStatus(200);
     });
 
     /**
@@ -180,7 +180,7 @@ module.exports = function (options, imports, register) {
                 screen.removeChannel(channelId);
 
                 // Send response back that we have send the event to the client.
-                res.send(200);
+                res.sendStatus(200);
               },
               function (error) {
                 self.logger.error('API: channel not saved in delete screen.');
@@ -213,7 +213,7 @@ module.exports = function (options, imports, register) {
             obj.remove();
 
             // Channel have been load, as we guess that it's removable.
-            res.send(200);
+            res.sendStatus(200);
           },
           function (error) {
             res.send(error.message, 500);
@@ -250,7 +250,7 @@ module.exports = function (options, imports, register) {
             self.logger.info('API: channel "' + channel.key + '" pushed.');
 
             // Send response back.
-            res.send(200);
+            res.sendStatus(200);
           },
           function (error) {
             res.send(error.message, 500);
