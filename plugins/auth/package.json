@@ -16,7 +16,9 @@
     "consumes": [
       "app",
       "logger",
-      "apikeys"
+      "apikeys",
+      "cache",
+      "screen"
     ]
   }
 }

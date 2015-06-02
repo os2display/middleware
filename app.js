@@ -54,7 +54,8 @@ var config = [
     "packagePath": "./plugins/channel"
   },
   {
-    "packagePath": "./plugins/api"
+    "packagePath": "./plugins/api",
+    "secret": configs.secret
   }
 ];
 

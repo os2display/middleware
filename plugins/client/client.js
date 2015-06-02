@@ -31,7 +31,7 @@ module.exports = function (options, imports, register) {
      */
     socket.on('ready', function () {
       // Try to get the screen.
-      var screen = new Screen(profile.apikey, profile.screenID);
+      var screen = new Screen(profile.apikey, profile.screenID, profile.activationCode);
       screen.load().then(
         function (screenObj) {
           screenObj.title = profile.screenTitle;

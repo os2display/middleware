@@ -248,22 +248,27 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
      * Helper function to load heartbeats from the backend.
      */
     function getHeartbeats () {
+      // Init empty hart beats.
+      $scope.heartbeats = {};
+
       // Start by loading API keys to ensure contextual information is
       // available.
       dataService.fetch('get', '/api/admin/keys').then(
         function (data) {
           $scope.apikeys = data;
 
-          // Load heartbeats.
-          dataService.fetch('get', '/api/admin/status/heartbeats').then(
-            function (data) {
-              $scope.heartbeats = data;
-            },
-            function (reason) {
-              $scope.message = reason.message;
-              $scope.messageClass = 'alert-danger';
-            }
-          );
+          for (var apikey in data) {
+            // Load heartbeats.
+            dataService.fetch('get', '/api/admin/status/heartbeats/' +  apikey).then(
+              function (data) {
+                $scope.heartbeats[data.apikey] = data.beats;
+              },
+              function (reason) {
+                $scope.message = reason.message;
+                $scope.messageClass = 'alert-danger';
+              }
+            );
+          }
         },
         function (reason) {
           $scope.message = reason.message;
@@ -278,10 +283,27 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
      * @TODO: Refactor this with the getHeartbeats and get api keys.
      */
     function getChannels() {
-      // Load heartbeats.
-      dataService.fetch('get', '/api/admin/status/channels').then(
+      // Init empty hart beats.
+      $scope.channels = {};
+
+      // Start by loading API keys to ensure contextual information is
+      // available.
+      dataService.fetch('get', '/api/admin/keys').then(
         function (data) {
-          $scope.channels = data;
+          $scope.apikeys = data;
+
+          for (var apikey in data) {
+            // Load heartbeats.
+            dataService.fetch('get', '/api/admin/status/channels/' +  apikey).then(
+              function (data) {
+                $scope.channels[data.apikey] = data.channels;
+              },
+              function (reason) {
+                $scope.message = reason.message;
+                $scope.messageClass = 'alert-danger';
+              }
+            );
+          }
         },
         function (reason) {
           $scope.message = reason.message;
