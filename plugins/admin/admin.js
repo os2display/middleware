@@ -157,12 +157,6 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
 
   /**
    * Get all heartbeats.
-   *
-   * First load all API keys then loop over them and find all screen under that
-   * key. Then load the screen to get the last heartbeat, but as this is async
-   * loading on all levels one have to keep track of when all data have been
-   * load an first sent back response when all data have been acquired from the
-   * different stores (filesystem and cache).
    */
   app.get('/api/admin/status/heartbeats/:apikey', function (req, res) {
     if (self.validateCall(req)) {
@@ -187,6 +181,7 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
           // Loop over screens.
           for (var i in screens) {
             var screen = new Screen(apikey, screens[i]);
+            /// THEN ALL NEEDED HERE.
             screen.load().then(
               function (screenObj) {
                 data.beats.push({
@@ -216,11 +211,6 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
 
   /**
    * Get status for all channels.
-   *
-   * @TODO: Refactor this with the heartbeat above, they one create different
-   * objects and do lookup in a different cache buckets.
-   *
-   * @see /api/admin/status/heartbeats
    */
   app.get('/api/admin/status/channels/:apikey', function (req, res) {
     if (self.validateCall(req)) {

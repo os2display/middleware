@@ -15,6 +15,8 @@ module.exports = function (options, imports, register) {
   var Channel = imports.channel;
   var Screen = imports.screen;
 
+  var expressJwt = require('express-jwt');
+
   /**
    * API Object.
    *
@@ -23,7 +25,6 @@ module.exports = function (options, imports, register) {
   var API = function () {
 
     // Injections.
-    var app = imports.app;
     this.app = imports.app;
     this.logger = imports.logger;
 
@@ -33,7 +34,7 @@ module.exports = function (options, imports, register) {
     /**
      * Default get request.
      */
-    this.app.get('/api', function (req, res) {
+    this.app.get('/api', expressJwt({"secret": options.secret}), function (req, res) {
       res.send('Please see documentation about using this api.');
     });
 
@@ -53,25 +54,25 @@ module.exports = function (options, imports, register) {
                 res.sendStatus(200);
               },
               function (error) {
-                res.send(error.message, 500);
+                res.status(500).send(error.message);
               }
             );
           },
           function (error) {
-            res.send(error.message, 500);
+            res.status(500).send(error.message);
           }
         );
       }
       else {
         self.logger.error('API: missing id parameter in update screen.');
-        res.send('Missing parameters in update screen.', 500);
+        res.status(500).send('Missing parameters in update screen.');
       }
     });
 
     /**
      * Screen: update.
      */
-    this.app.put('/api/screen/:id', function (req, res) {
+    this.app.put('/api/screen/:id', expressJwt({"secret": options.secret}), function (req, res) {
       var profile = req.user;
 
       if (req.params.hasOwnProperty('id') && req.body.hasOwnProperty('title')) {
@@ -90,12 +91,12 @@ module.exports = function (options, imports, register) {
                 res.sendStatus(200);
               },
               function (error) {
-                res.send(error.message, 500);
+                res.status(500).send(error.message);
               }
             );
           },
           function (error) {
-            res.send(error.message, 500);
+            res.status(500).send(error.message);
           }
         );
       }
@@ -108,7 +109,7 @@ module.exports = function (options, imports, register) {
     /**
      * Screen: reload.
      */
-    this.app.post('/api/screen/:id/reload', function (req, res) {
+    this.app.post('/api/screen/:id/reload', expressJwt({"secret": options.secret}), function (req, res) {
       var profile = req.user;
 
       if (req.params.hasOwnProperty('id')) {
@@ -121,17 +122,17 @@ module.exports = function (options, imports, register) {
               res.sendStatus(200);
             }
             else {
-              res.send('Screen connection could not be found.', 503);
+              res.status(503).send('Screen connection could not be found.');
             }
           },
           function (error) {
-            res.send(error.message, 500);
+            res.status(500).send(error.message);
           }
         );
       }
       else {
         self.logger.error('API: missing id parameter in reload screen.');
-        res.send('Missing parameters in reload screen.', 500);
+        res.status(500).send('Missing parameters in reload screen.');
       }
     });
 
@@ -155,7 +156,7 @@ module.exports = function (options, imports, register) {
      * inside the channel. Then save the channel and load the screen and send
      * removeChannel event to the client.
      */
-    this.app.delete('/api/channel/:channelId/screen/:screenId', function (req, res) {
+    this.app.delete('/api/channel/:channelId/screen/:screenId', expressJwt({"secret": options.secret}), function (req, res) {
       var profile = req.user;
 
       if (req.params.hasOwnProperty('channelId') && req.params.hasOwnProperty('screenId')) {
@@ -184,25 +185,25 @@ module.exports = function (options, imports, register) {
               },
               function (error) {
                 self.logger.error('API: channel not saved in delete screen.');
-                res.send(error.message, 500);
+                res.status(500).send(error.message);
               }
             );
           },
           function (error) {
-            res.send(error.message, 500);
+            res.status(500).send(error.message);
           }
         );
       }
       else {
         self.logger.error('API: missing id parameter in remove channel.');
-        res.send('Missing parameters in remove channel.', 500);
+        res.status(500).send('Missing parameters in remove channel.');
       }
     });
 
     /**
      * Channel: remove.
      */
-    this.app.delete('/api/channel/:id', function (req, res) {
+    this.app.delete('/api/channel/:id', expressJwt({"secret": options.secret}), function (req, res) {
       var profile = req.user;
 
       if (req.params.hasOwnProperty('id')) {
@@ -216,20 +217,20 @@ module.exports = function (options, imports, register) {
             res.sendStatus(200);
           },
           function (error) {
-            res.send(error.message, 500);
+            res.status(500).send(error.message);
           }
         );
       }
       else {
         self.logger.error('API: missing id parameter in remove channel.');
-        res.send('Missing parameters in remove channel.', 500);
+        res.status(500).send('Missing parameters in remove channel.');
       }
     });
 
     /**
      * Channel: create/update better known has push.
      */
-    app.post('/api/channel/:id', function (req, res) {
+    this.app.post('/api/channel/:id', expressJwt({"secret": options.secret}), function (req, res) {
       var profile = req.user;
 
       // Validate basic data structure.
@@ -253,13 +254,13 @@ module.exports = function (options, imports, register) {
             res.sendStatus(200);
           },
           function (error) {
-            res.send(error.message, 500);
+            res.status(500).send(error.message);
           }
         );
       }
       else {
         self.logger.error('API: missing parameters in channel push.');
-        res.send('Missing parameters in channel push.', 500);
+        res.status(500).send('Missing parameters in channel push.');
       }
     });
   };

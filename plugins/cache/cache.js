@@ -234,19 +234,63 @@ module.exports = function (options, imports, register) {
    *
    * @param key
    *   The key to store the value under.
-   * @param hash
+   * @param field
    *   The hash to store the value under.
    * @param value
    *   The value to store.
    * @param callback
-   *   Callback funcion to call on completion. It will send two parameters "err" and "res".
+   *   Callback function to call on completion. It will send two parameters "err" and "res".
    */
-  Cache.prototype.hashSet = function hashSet(key, hash, value, callback) {
+  Cache.prototype.hashSet = function hashSet(key, field, value, callback) {
     var self = this;
 
     // Handle connection event.
     self.once('connected', function () {
-      self.service.hset(key, hash, value, callback);
+      self.service.hset(key, field, value, callback);
+    });
+
+    // Connect.
+    connectCache(self);
+  };
+
+  /**
+   * Get the values of all the given hash fields.
+   *
+   * @param key
+   *   The key to fetch values under.
+   * @param field
+   *   The field values to retrieve.
+   * @param callback
+   *   Callback function to call on completion. It will send two parameters "err" and "res".
+   */
+  Cache.prototype.hashGet = function hashGet(key, field, callback) {
+    var self = this;
+
+    // Handle connection event.
+    self.once('connected', function () {
+      self.service.hget(key, field, callback);
+    });
+
+    // Connect.
+    connectCache(self);
+  };
+
+  /**
+   * Remove hash field.
+   *
+   * @param key
+   *   The key to fetch values under.
+   * @param field
+   *   The field values to retrieve.
+   * @param callback
+   *   Callback function to call on completion. It will send two parameters "err" and "res".
+   */
+  Cache.prototype.hashRemove = function hashRemove(key, field, callback) {
+    var self = this;
+
+    // Handle connection event.
+    self.once('connected', function () {
+      self.service.hdel(key, field, callback);
     });
 
     // Connect.

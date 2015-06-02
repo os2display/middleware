@@ -14,7 +14,7 @@ module.exports = function (options, imports, register) {
   // HTTP request.
   var request = require('request-json');
 
-  var Screen = function Screen(apikey, id) {
+  var Screen = function Screen(apikey, id, activationCode) {
     this.apikey = apikey;
     this.id = id;
 
@@ -24,6 +24,7 @@ module.exports = function (options, imports, register) {
     this.heartbeat = undefined;
     this.options = undefined;
     this.template = undefined;
+    this.activationCode = activationCode;
 
     // Injections.
     this.logger = imports.logger;
@@ -45,7 +46,7 @@ module.exports = function (options, imports, register) {
 
     self.cache.get(self.key, function(err, res) {
       if (err) {
-        self.logger.error('Screen: redis encountered an error in load.');
+        self.logger.error('Screen: cache encountered an error in load.');
         deferred.reject(err);
       }
       else {
@@ -55,6 +56,7 @@ module.exports = function (options, imports, register) {
           self.heartbeat = data.heartbeat;
           self.options = data.options;
           self.template = data.template;
+          self.activationCode = data.activationCode;
 
           // Notify that the screen have been loaded.
           deferred.resolve(self);
@@ -117,22 +119,23 @@ module.exports = function (options, imports, register) {
 
     // Information to store in redis.
     var data = {
-      title: self.title,
-      heartbeat: self.heartbeat,
-      options: self.options,
-      template: self.template
+      "title": self.title,
+      "heartbeat": self.heartbeat,
+      "options": self.options,
+      "template": self.template,
+      "activationCode": self.activationCode
     };
 
     imports.cache.set(self.key, JSON.stringify(data), function(err, res) {
       if (err) {
-        self.logger.error('Screen: redis encounted an error in save.');
+        self.logger.error('Screen: cache encountered an error in save.');
         deferred.reject(err);
       }
       else {
-        // Add channel id, so channels can be searched.
+        // Add screen id, so screens can be searched.
         self.cache.addSet('screen:' + self.apikey, self.id, function(err, res) {
           if (err) {
-            self.logger.error('Channel: redis encounted an error in save set.');
+            self.logger.error('Channel: cache encountered an error in save set.');
             deferred.reject(err);
           }
           else {
@@ -158,13 +161,13 @@ module.exports = function (options, imports, register) {
 
     self.cache.remove(self.key, function(err, res) {
       if (err) {
-        self.logger.error('Screen: redis encounted an error in remove.');
+        self.logger.error('Screen: cache encountered an error in remove.');
         deferred.reject(err);
       }
       else {
         self.cache.removeSet('screen:' + self.apikey, self.id, function (err, res) {
           if (err) {
-            self.logger.error('Screen: redis encounted an error in del screen set.');
+            self.logger.error('Screen: cache encountered an error in del screen set.');
           }
 
           // We do send the booted event even if the above error is logged as
@@ -173,6 +176,15 @@ module.exports = function (options, imports, register) {
           if (socket) {
             socket.emit('booted', {"statusCode": 404});
             socket.disconnect();
+          }
+
+          // Remove activation record.
+          if (self.activationCode !== undefined) {
+            self.cache.hashRemove('activation:' + self.apikey, self.activationCode, function(error, res) {
+              if (error) {
+                imports.logger.error('Screen: Activation code hash could not be removed.');
+              }
+            });
           }
 
           // Notify that the screen have been removed.
@@ -199,7 +211,7 @@ module.exports = function (options, imports, register) {
       socket.emit('channelPush', data);
     }
     else {
-      self.logger.info('Screen: content could not be pused to "' + self.key + '" as it is not connected.');
+      self.logger.info('Screen: channel could not be pushed to "' + self.key + '" as it is not connected.');
     }
   };
 
@@ -219,7 +231,7 @@ module.exports = function (options, imports, register) {
       socket.emit('channelRemoved', { "id": channelId });
     }
     else {
-      self.logger.info('Screen: content could not be pused to "' + self.key + '" as it is not connected.');
+      self.logger.info('Screen: channel could not be removed from "' + self.key + '" as it is not connected.');
     }
   };
 
