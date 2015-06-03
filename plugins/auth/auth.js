@@ -112,7 +112,7 @@ module.exports = function (options, imports, register) {
           // Activation code have been used before.
           res.status(409).send({
             "token": token,
-            "message": 'Activation code is used before.\n\nIf you continue we will logout the other screen currently connected with that code.\n\nDu you want to logout the other screens?'
+            "message": 'Activation code is used before.\n\nIf you continue we will logout the other screen currently connected with that code.\n\nDo you want to logout the other screens?'
           });
         }
         else {

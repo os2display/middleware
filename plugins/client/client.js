@@ -117,6 +117,29 @@ module.exports = function (options, imports, register) {
     });
 
     /**
+     * Logout event from the screen which requires the screen to be removed.
+     */
+    socket.on('logout', function () {
+      // Try to get the screen.
+      var screen = new Screen(profile.apikey, profile.screenID, profile.activationCode);
+      screen.load().then(
+        function (screenObj) {
+          screenObj.remove().then(
+            function () {
+              logger.info('Client: Logged out ' + profile.apikey + ':' + profile.screenID);
+            },
+            function (error) {
+              logger.error('Client: ' + error.message);
+            }
+          );
+        },
+        function (error) {
+          logger.error('Client: ' + error.message);
+        }
+      );
+    });
+
+    /**
      * Heartbeat event.
      *
      * Handle heartbeat event used to check that the screen are alive.
