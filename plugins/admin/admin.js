@@ -21,47 +21,49 @@
  *
  * @constructor
  */
-var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
+var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options) {
   "use strict";
 
   var self = this;
   this.logger = logger;
   this.cache = cache;
 
+  this.expressJwt = require('express-jwt');
+
   /**
    * Default get request.
    */
-  app.get('/api/admin', function (req, res) {
+  app.get('/api/admin', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       res.send('Please see documentation about using this administration api.');
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Get API keys.
    */
-  app.get('/api/admin/keys', function (req, res) {
+  app.get('/api/admin/keys', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       apikeys.load().then(
         function (keys) {
           res.json(keys);
         }, function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Get single API key.
    */
-  app.get('/api/admin/key/:key', function (req, res) {
+  app.get('/api/admin/key/:key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       // Get info about API keys.
       apikeys.get(req.params.key).then(
@@ -70,7 +72,7 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
             res.json(info);
           }
           else {
-            res.send('The API key was not found.', 404);
+            res.status(404).send('The API key was not found.');
           }
         }, function (error) {
           res.send(error.message, 500);
@@ -78,14 +80,14 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Update API key.
    */
-  app.put('/api/admin/key/:key', function (req, res) {
+  app.put('/api/admin/key/:key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var info = req.body.api;
       var key = req.params.key;
@@ -95,44 +97,44 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
 
       apikeys.update(key, info).then(
         function (status) {
-          res.send('API key "' + key + '" have been updated.', 200);
+          res.send('API key "' + key + '" have been updated.');
         },
         function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Delete API keys.
    */
-  app.delete('/api/admin/key/:key', function (req, res) {
+  app.delete('/api/admin/key/:key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var key = req.params.key;
 
       // Remove API key.
       apikeys.remove(key).then(
         function (status) {
-          res.send('API key "' + key + '" have been removed.', 200);
+          res.send('API key "' + key + '" have been removed.');
         },
         function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Add API key.
    */
-  app.post('/api/admin/key', function (req, res) {
+  app.post('/api/admin/key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var info = req.body.api;
       var key = req.body.api.key;
@@ -143,22 +145,22 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
       // Add API key.
       apikeys.add(key, info).then(
         function (status) {
-          res.send('API key "' + key + '" have been added.', 200);
+          res.send('API key "' + key + '" have been added.');
         },
         function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Get all heartbeats.
    */
-  app.get('/api/admin/status/heartbeats/:apikey', function (req, res) {
+  app.get('/api/admin/status/heartbeats/:apikey', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var apikey = req.params.apikey;
       var data = {
@@ -205,14 +207,14 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
       });
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Get status for all channels.
    */
-  app.get('/api/admin/status/channels/:apikey', function (req, res) {
+  app.get('/api/admin/status/channels/:apikey', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var apikey = req.params.apikey;
       var data = {
@@ -259,7 +261,7 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
 
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 };
@@ -284,7 +286,7 @@ module.exports = function (options, imports, register) {
   "use strict";
 
   // Create the API routes using the API object.
-  var admin = new Admin(imports.app, imports.logger, imports.apikeys, imports.cache, imports.screen, imports.channel);
+  var admin = new Admin(imports.app, imports.logger, imports.apikeys, imports.cache, imports.screen, imports.channel, options);
 
   // This plugin extends the server plugin and do not provide new services.
   register(null, null);

@@ -25,7 +25,8 @@ var config = [
     "path": path.join(__dirname, 'public')
   },
   {
-    "packagePath": "./plugins/admin"
+    "packagePath": "./plugins/admin",
+    "secret": configs.secret
   },
   {
     "packagePath": "./plugins/cache",
