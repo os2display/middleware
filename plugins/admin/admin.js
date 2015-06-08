@@ -264,6 +264,47 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
       res.status(401).send('You do not have the right role.');
     }
   });
+
+  /**
+   * Reload screen.
+   */
+  app.get('/api/admin/:apikey/screen/:id/reload', this.expressJwt({"secret": options.secret}), function (req, res) {
+    if (self.validateCall(req)) {
+      var apikey = req.params.apikey;
+      var screenId = req.params.id;
+
+      var screen = new Screen(apikey, screenId);
+      screen.reload();
+
+      res.sendStatus(200);
+    }
+    else {
+      res.status(401).send('You do not have the right role.');
+    }
+  });
+
+  /**
+   * Logout screen.
+   */
+  app.get('/api/admin/:apikey/screen/:id/logout', this.expressJwt({"secret": options.secret}), function (req, res) {
+    if (self.validateCall(req)) {
+      var apikey = req.params.apikey;
+      var screenId = req.params.id;
+
+      var screen = new Screen(apikey, screenId);
+      screen.remove().then(
+        function () {
+          res.sendStatus(200);
+        },
+        function () {
+          res.sendStatus(500);
+        }
+      );
+    }
+    else {
+      res.status(401).send('You do not have the right role.');
+    }
+  });
 };
 
 

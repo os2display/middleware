@@ -326,6 +326,48 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
       getChannels();
     };
 
+    /**
+     * Reload screen.
+     *
+     * @param screenId
+     *   The id of the screen to reload.
+     * @param apikey
+     *   The API key to which the screen uses.
+     */
+    $scope.reloadScreen = function reloadScreen(screenId, apikey) {
+      dataService.fetch('get', '/api/admin/' + apikey + '/screen/' + screenId + '/reload/').then(
+        function (data) {
+          $scope.message = 'Sent reload message to screen (' + screenId + ').';
+          $scope.messageClass = 'alert-success';
+        },
+        function (reason) {
+          $scope.message = reason.message;
+          $scope.messageClass = 'alert-danger';
+        }
+      );
+    };
+
+    /**
+     * Reload screen.
+     *
+     * @param screenId
+     *   The id of the screen to reload.
+     * @param apikey
+     *   The API key to which the screen uses.
+     */
+    $scope.logoutScreen = function logoutScreen(screenId, apikey) {
+      dataService.fetch('get', '/api/admin/' + apikey + '/screen/' + screenId + '/logout/').then(
+        function (data) {
+          $scope.message = 'Sent logout message to screen (' + screenId + ').';
+          $scope.messageClass = 'alert-success';
+        },
+        function (reason) {
+          $scope.message = reason.message;
+          $scope.messageClass = 'alert-danger';
+        }
+      );
+    };
+
     // Get the controller up and running.
     getHeartbeats();
     getChannels();

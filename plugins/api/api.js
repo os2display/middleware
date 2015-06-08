@@ -237,6 +237,7 @@ module.exports = function (options, imports, register) {
       if (req.params.hasOwnProperty('id') && req.body.hasOwnProperty('data')) {
         // Try to create channel.
         var channel = new Channel(profile.apikey, req.params.id);
+        channel.title = req.body.title;
         channel.data = req.body.data;
         channel.screens = req.body.screens;
         channel.regions = req.body.regions;

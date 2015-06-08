@@ -24,6 +24,7 @@
           <th>Id</th>
           <th>Screen</th>
           <th>Heartbeat</th>
+          <th>Action</th>
         </tr>
         </thead>
         <tr data-ng-repeat="beat in beats">
@@ -31,7 +32,14 @@
           <td>{{ beat.id }}</td>
           <td>{{ beat.title }}</td>
           <td>{{ beat.heartbeat * 1000 | date:'dd/MM/yy HH:mm:ss' }}</td>
-          <td></td>
+          <td>
+            <button type="button" class="btn btn-success btn-xs" data-ng-click="reloadScreen(beat.id, apikey)">
+              <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reload
+            </button>
+            <button type="button" class="btn btn-danger btn-xs" data-ng-click="logoutScreen(beat.id, apikey)">
+              <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> logout
+            </button>
+          </td>
         </tr>
       </table>
     </div>
