@@ -29,6 +29,7 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
   this.cache = cache;
 
   this.expressJwt = require('express-jwt');
+  this.Q = require('q');
 
   /**
    * Default get request.
@@ -173,36 +174,27 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
           self.logger.error(err.message);
         }
         else {
-          var len = screens.length;
+          // Start promise group to load all screens under the api-key.
+          self.Q()
+            .then(function () {
+              var screenPromises = [];
 
-          // Check if any screens are active on for the api key.
-          if (!len) {
-            res.send(data);
-          }
-
-          // Loop over screens.
-          for (var i in screens) {
-            var screen = new Screen(apikey, screens[i]);
-            /// THEN ALL NEEDED HERE.
-            screen.load().then(
-              function (screenObj) {
-                data.beats.push({
-                  "id": screenObj.id,
-                  "title": screenObj.title,
-                  "heartbeat": screenObj.heartbeat
-                });
-
-                // When to return the data.
-                if ((Number(i) + 1) === len) {
-                  // All screens have been loaded.
-                  res.send(data);
-                }
-              },
-              function (error) {
-                self.logger.error(error.message);
+              // Loop over screens and build promises array.
+              for (var i in screens) {
+                screenPromises.push(loadScreen(apikey, screens[i]));
               }
-            );
-          }
+
+              return screenPromises;
+            })
+            .all()
+            .then(function (results) {
+              data.beats = results;
+              res.send(data);
+            },
+            function (error) {
+              res.status(500).send(error.message);
+            }
+          )
         }
       });
     }
@@ -210,6 +202,37 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
       res.status(401).send('You do not have the right role.');
     }
   });
+
+  /**
+   * Helper function to load a screen.
+   *
+   * @param apikey
+   *   API-key for the screen to load.
+   * @param screenId
+   *   The id of screen to load.
+   *
+   * @returns {*}
+   */
+  function loadScreen(apikey, screenId) {
+    var deferred = self.Q.defer();
+
+    var screen = new Screen(apikey, screenId);
+    screen.load().then(
+      function (screenObj) {
+        deferred.resolve({
+          "id": screenObj.id,
+          "title": screenObj.title,
+          "heartbeat": screenObj.heartbeat
+        })
+      },
+      function (error) {
+        self.logger.error(error.message);
+        deferred.reject(error.message);
+      }
+    );
+
+    return deferred.promise;
+  }
 
   /**
    * Get status for all channels.
@@ -227,35 +250,27 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
           self.logger.error(err.message);
         }
         else {
-          var len = channels.length;
+          // Start promise group to load all channels under the api-key.
+          self.Q()
+            .then(function () {
+              var channelPromises = [];
 
-          // Check if any channels are available for the api key.
-          if (!len) {
-            res.send(data);
-          }
-
-          // Loop over channels.
-          for (var i in channels) {
-            var channel = new Channel(apikey, channels[i]);
-            channel.load().then(
-              function (channelObj) {
-                data.channels.push({
-                  "id": channelObj.id,
-                  "title": channelObj.title,
-                  "screens": channelObj.screens.length
-                });
-
-                // When to return the data.
-                if ((Number(i) + 1) === len) {
-                  // All channels have been loaded.
-                  res.send(data);
-                }
-              },
-              function (error) {
-                self.logger.error(error.message);
+              // Loop over channels and build promises array.
+              for (var i in channels) {
+                channelPromises.push(loadChannel(apikey, channels[i]));
               }
-            );
-          }
+
+              return channelPromises;
+            })
+            .all()
+            .then(function (results) {
+              data.channels = results;
+              res.send(data);
+            },
+            function (error) {
+              res.status(500).send(error.message);
+            }
+          )
         }
       });
 
@@ -266,14 +281,42 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
   });
 
   /**
+   * Helper function to load a channel
+   *
+   * @param apikey
+   *   API-key for the channel to load.
+   * @param channelId
+   *   The ID of the channel to load.
+   *
+   * @returns {*}
+   */
+  function loadChannel(apikey, channelId) {
+    var deferred = self.Q.defer();
+
+    var channel = new Channel(apikey, channelId);
+    channel.load().then(
+      function (channelObj) {
+        deferred.resolve({
+          "id": channelObj.id,
+          "title": channelObj.title,
+          "screens": channelObj.screens
+        });
+      },
+      function (error) {
+        self.logger.error(error.message);
+        deferred.reject(error.message);
+      }
+    );
+
+    return deferred.promise;
+  }
+
+  /**
    * Reload screen.
    */
   app.get('/api/admin/:apikey/screen/:id/reload', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
-      var apikey = req.params.apikey;
-      var screenId = req.params.id;
-
-      var screen = new Screen(apikey, screenId);
+      var screen = new Screen(req.params.apikey, req.params.id);
       screen.reload();
 
       res.sendStatus(200);
@@ -288,10 +331,7 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
    */
   app.get('/api/admin/:apikey/screen/:id/logout', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
-      var apikey = req.params.apikey;
-      var screenId = req.params.id;
-
-      var screen = new Screen(apikey, screenId);
+      var screen = new Screen(req.params.apikey, req.params.id);
       screen.remove().then(
         function () {
           res.sendStatus(200);

@@ -61,13 +61,15 @@
           <th>Id</th>
           <th>Title</th>
           <th>No. screens</th>
+          <th>Screens</th>
         </tr>
         </thead>
         <tr data-ng-repeat="channel in info">
           <td>{{ $index + 1 }}</td>
           <td>{{ channel.id }}</td>
           <td>{{ channel.title }}</td>
-          <td>{{ channel.screens }}</td>
+          <td>{{ channel.screens.length }}</td>
+          <td><span data-ng-repeat="screen in channel.screens">{{ screen }}{{$last ? '' : ', '}}</span></td>
           <td></td>
         </tr>
       </table>
