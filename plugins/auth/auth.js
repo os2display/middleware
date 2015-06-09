@@ -180,17 +180,10 @@ module.exports = function (options, imports, register) {
     // Check that the role is correct (kicker) is a role given in the activation code above.
     if (req.user.role === 'kicker') {
       // Load screen.
-      var screen = new imports.screen(req.user.apikey, req.user.screenID);
-      screen.load().then(
-        function (screenObj) {
-          screenObj.remove().then(
-            function () {
-              res.sendStatus(200);
-            },
-            function (error) {
-              imports.logger.error('Auth: ' + error.message);
-            }
-          );
+      var screen = new imports.screen(req.user.apikey, req.user.screenID, req.user.activationCode);
+      screen.remove().then(
+        function () {
+          res.sendStatus(200);
         },
         function (error) {
           imports.logger.error('Auth: ' + error.message);
