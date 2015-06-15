@@ -31,7 +31,7 @@ module.exports = function (options, imports, register) {
      */
     socket.on('ready', function () {
       // Try to get the screen.
-      var screen = new Screen(profile.apikey, profile.screenID);
+      var screen = new Screen(profile.apikey, profile.screenID, profile.activationCode);
       screen.load().then(
         function (screenObj) {
           screenObj.title = profile.screenTitle;
@@ -104,13 +104,36 @@ module.exports = function (options, imports, register) {
           );
         },
         function (error) {
+          // Log error.
+          logger.error('Client: ' + error.message);
+
           // Send error to client.
           socket.emit('error', {
             "statusCode": 500,
             "message": error.message
           });
+        }
+      );
+    });
 
-          // Log error.
+    /**
+     * Logout event from the screen which requires the screen to be removed.
+     */
+    socket.on('logout', function () {
+      // Try to get the screen.
+      var screen = new Screen(profile.apikey, profile.screenID, profile.activationCode);
+      screen.load().then(
+        function (screenObj) {
+          screenObj.remove().then(
+            function () {
+              logger.info('Client: Logged out ' + profile.apikey + ':' + profile.screenID);
+            },
+            function (error) {
+              logger.error('Client: ' + error.message);
+            }
+          );
+        },
+        function (error) {
           logger.error('Client: ' + error.message);
         }
       );

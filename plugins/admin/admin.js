@@ -21,47 +21,50 @@
  *
  * @constructor
  */
-var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
+var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options) {
   "use strict";
 
   var self = this;
   this.logger = logger;
   this.cache = cache;
 
+  this.expressJwt = require('express-jwt');
+  this.Q = require('q');
+
   /**
    * Default get request.
    */
-  app.get('/api/admin', function (req, res) {
+  app.get('/api/admin', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       res.send('Please see documentation about using this administration api.');
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Get API keys.
    */
-  app.get('/api/admin/keys', function (req, res) {
+  app.get('/api/admin/keys', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       apikeys.load().then(
         function (keys) {
           res.json(keys);
         }, function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Get single API key.
    */
-  app.get('/api/admin/key/:key', function (req, res) {
+  app.get('/api/admin/key/:key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       // Get info about API keys.
       apikeys.get(req.params.key).then(
@@ -70,7 +73,7 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
             res.json(info);
           }
           else {
-            res.send('The API key was not found.', 404);
+            res.status(404).send('The API key was not found.');
           }
         }, function (error) {
           res.send(error.message, 500);
@@ -78,14 +81,14 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Update API key.
    */
-  app.put('/api/admin/key/:key', function (req, res) {
+  app.put('/api/admin/key/:key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var info = req.body.api;
       var key = req.params.key;
@@ -95,44 +98,44 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
 
       apikeys.update(key, info).then(
         function (status) {
-          res.send('API key "' + key + '" have been updated.', 200);
+          res.send('API key "' + key + '" have been updated.');
         },
         function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Delete API keys.
    */
-  app.delete('/api/admin/key/:key', function (req, res) {
+  app.delete('/api/admin/key/:key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var key = req.params.key;
 
       // Remove API key.
       apikeys.remove(key).then(
         function (status) {
-          res.send('API key "' + key + '" have been removed.', 200);
+          res.send('API key "' + key + '" have been removed.');
         },
         function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Add API key.
    */
-  app.post('/api/admin/key', function (req, res) {
+  app.post('/api/admin/key', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
       var info = req.body.api;
       var key = req.body.api.key;
@@ -143,146 +146,203 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel) {
       // Add API key.
       apikeys.add(key, info).then(
         function (status) {
-          res.send('API key "' + key + '" have been added.', 200);
+          res.send('API key "' + key + '" have been added.');
         },
         function (error) {
-          res.send(error.message, 500);
+          res.status(500).send(error.message);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
    * Get all heartbeats.
-   *
-   * First load all API keys then loop over them and find all screen under that
-   * key. Then load the screen to get the last heartbeat, but as this is async
-   * loading on all levels one have to keep track of when all data have been
-   * load an first sent back response when all data have been acquired from the
-   * different stores (filesystem and cache).
    */
-  app.get('/api/admin/status/heartbeats', function (req, res) {
+  app.get('/api/admin/status/heartbeats/:apikey', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
-      apikeys.load().then(
-        function (keys) {
-          var heartbeats = {};
-          for (var apikey in keys) {
-            self.cache.membersOfSet('screen:' + apikey, function (err, screens) {
-              if (err) {
-                self.logger.error(err.message);
-              }
-              else {
-                heartbeats[apikey] = [];
+      var apikey = req.params.apikey;
+      var data = {
+        "apikey": apikey,
+        "beats": []
+      };
 
-                var len = screens.length;
-                for (var i in screens) {
-                  var screen = new Screen(apikey, screens[i]);
-                  screen.load().then(
-                    function (screenObj) {
-                      heartbeats[apikey].push({
-                        "id": screenObj.id,
-                        "title": screenObj.title,
-                        "heartbeat": screenObj.heartbeat
-                      });
-
-                      // When to return the data.
-                      if ((Number(i) + 1) === len) {
-                        // This api key's screens are done. So remove the key from
-                        // the array.
-                        delete keys[apikey];
-
-                        // Check if any more api key groups exists.
-                        if (!Object.keys(keys).length) {
-                          // All screens inside all api keys have been loaded, so
-                          // lets return the content.
-                          res.send(heartbeats);
-                        }
-                      }
-                    },
-                    function (error) {
-                      self.logger.error(error.message);
-                    }
-                  );
-                }
-              }
-            });
-          }
-        }, function (error) {
-          res.send(error.message, 500);
+      self.cache.membersOfSet('screen:' + apikey, function (err, screens) {
+        if (err) {
+          self.logger.error(err.message);
         }
-      );
+        else {
+          // Start promise group to load all screens under the api-key.
+          self.Q()
+            .then(function () {
+              var screenPromises = [];
 
+              // Loop over screens and build promises array.
+              for (var i in screens) {
+                screenPromises.push(loadScreen(apikey, screens[i]));
+              }
+
+              return screenPromises;
+            })
+            .all()
+            .then(function (results) {
+              data.beats = results;
+              res.send(data);
+            },
+            function (error) {
+              res.status(500).send(error.message);
+            }
+          )
+        }
+      });
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 
   /**
-   * Get status for all channels.
+   * Helper function to load a screen.
    *
-   * @TODO: Refactor this with the heartbeat above, they one create different
-   * objects and do lookup in a different cache buckets.
+   * @param apikey
+   *   API-key for the screen to load.
+   * @param screenId
+   *   The id of screen to load.
    *
-   * @see /api/admin/status/heartbeats
+   * @returns {*}
    */
-  app.get('/api/admin/status/channels', function (req, res) {
+  function loadScreen(apikey, screenId) {
+    var deferred = self.Q.defer();
+
+    var screen = new Screen(apikey, screenId);
+    screen.load().then(
+      function (screenObj) {
+        deferred.resolve({
+          "id": screenObj.id,
+          "title": screenObj.title,
+          "heartbeat": screenObj.heartbeat
+        })
+      },
+      function (error) {
+        self.logger.error(error.message);
+        deferred.reject(error.message);
+      }
+    );
+
+    return deferred.promise;
+  }
+
+  /**
+   * Get status for all channels.
+   */
+  app.get('/api/admin/status/channels/:apikey', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
-      apikeys.load().then(
-        function (keys) {
-          var info = {};
+      var apikey = req.params.apikey;
+      var data = {
+        "apikey": apikey,
+        "channels": []
+      };
 
-          for (var apikey in keys) {
-            self.cache.membersOfSet('channel:' + apikey, function (err, channels) {
-              if (err) {
-                self.logger.error(err.message);
+      self.cache.membersOfSet('channel:' + apikey, function (err, channels) {
+        if (err) {
+          self.logger.error(err.message);
+        }
+        else {
+          // Start promise group to load all channels under the api-key.
+          self.Q()
+            .then(function () {
+              var channelPromises = [];
+
+              // Loop over channels and build promises array.
+              for (var i in channels) {
+                channelPromises.push(loadChannel(apikey, channels[i]));
               }
-              else {
-                info[apikey] = [];
 
-                var len = channels.length;
-                for (var i in channels) {
-                  var channel = new Channel(apikey, channels[i]);
-                  channel.load().then(
-                    function (channelObj) {
-                      info[apikey].push({
-                        "id": channelObj.id,
-                        "title": channelObj.title,
-                        "screens": channelObj.screens.length
-                      });
+              return channelPromises;
+            })
+            .all()
+            .then(function (results) {
+              data.channels = results;
+              res.send(data);
+            },
+            function (error) {
+              res.status(500).send(error.message);
+            }
+          )
+        }
+      });
 
-                      // When to return the data.
-                      if ((Number(i) + 1) === len) {
-                        // This api key's channels are done. So remove the key from
-                        // the array.
-                        delete keys[apikey];
+    }
+    else {
+      res.status(401).send('You do not have the right role.');
+    }
+  });
 
-                        // Check if any more api key groups exists.
-                        if (!Object.keys(keys).length) {
-                          // All channels inside all api keys have been loaded, so
-                          // lets return the content.
-                          res.send(info);
-                        }
-                      }
-                    },
-                    function (error) {
-                      self.logger.error(error.message);
-                    }
-                  );
-                }
-              }
-            });
-          }
-        }, function (error) {
-          res.send(error.message, 500);
+  /**
+   * Helper function to load a channel
+   *
+   * @param apikey
+   *   API-key for the channel to load.
+   * @param channelId
+   *   The ID of the channel to load.
+   *
+   * @returns {*}
+   */
+  function loadChannel(apikey, channelId) {
+    var deferred = self.Q.defer();
+
+    var channel = new Channel(apikey, channelId);
+    channel.load().then(
+      function (channelObj) {
+        deferred.resolve({
+          "id": channelObj.id,
+          "title": channelObj.title,
+          "screens": channelObj.screens
+        });
+      },
+      function (error) {
+        self.logger.error(error.message);
+        deferred.reject(error.message);
+      }
+    );
+
+    return deferred.promise;
+  }
+
+  /**
+   * Reload screen.
+   */
+  app.get('/api/admin/:apikey/screen/:id/reload', this.expressJwt({"secret": options.secret}), function (req, res) {
+    if (self.validateCall(req)) {
+      var screen = new Screen(req.params.apikey, req.params.id);
+      screen.reload();
+
+      res.sendStatus(200);
+    }
+    else {
+      res.status(401).send('You do not have the right role.');
+    }
+  });
+
+  /**
+   * Logout screen.
+   */
+  app.get('/api/admin/:apikey/screen/:id/logout', this.expressJwt({"secret": options.secret}), function (req, res) {
+    if (self.validateCall(req)) {
+      var screen = new Screen(req.params.apikey, req.params.id. req.user.activationCode);
+      screen.remove().then(
+        function () {
+          res.sendStatus(200);
+        },
+        function () {
+          res.sendStatus(500);
         }
       );
     }
     else {
-      res.send('You do not have the right role.', 401);
+      res.status(401).send('You do not have the right role.');
     }
   });
 };
@@ -307,7 +367,7 @@ module.exports = function (options, imports, register) {
   "use strict";
 
   // Create the API routes using the API object.
-  var admin = new Admin(imports.app, imports.logger, imports.apikeys, imports.cache, imports.screen, imports.channel);
+  var admin = new Admin(imports.app, imports.logger, imports.apikeys, imports.cache, imports.screen, imports.channel, options);
 
   // This plugin extends the server plugin and do not provide new services.
   register(null, null);

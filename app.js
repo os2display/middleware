@@ -16,7 +16,7 @@ var configs = require(__dirname + '/config.json');
 var config = [
   {
     "packagePath": "./plugins/logger",
-    "filename": configs.log.file,
+    "filename": path.join(__dirname, configs.log.file),
     "debug": configs.log.debug
   },
   {
@@ -25,7 +25,8 @@ var config = [
     "path": path.join(__dirname, 'public')
   },
   {
-    "packagePath": "./plugins/admin"
+    "packagePath": "./plugins/admin",
+    "secret": configs.secret
   },
   {
     "packagePath": "./plugins/cache",
@@ -54,11 +55,8 @@ var config = [
     "packagePath": "./plugins/channel"
   },
   {
-    "packagePath": "./plugins/api"
-  },
-  {
-    "packagePath": "./plugins/sentry",
-    "url": configs.sentryUrl
+    "packagePath": "./plugins/api",
+    "secret": configs.secret
   }
 ];
 

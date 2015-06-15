@@ -24,6 +24,7 @@
           <th>Id</th>
           <th>Screen</th>
           <th>Heartbeat</th>
+          <th>Action</th>
         </tr>
         </thead>
         <tr data-ng-repeat="beat in beats">
@@ -31,7 +32,14 @@
           <td>{{ beat.id }}</td>
           <td>{{ beat.title }}</td>
           <td>{{ beat.heartbeat * 1000 | date:'dd/MM/yy HH:mm:ss' }}</td>
-          <td></td>
+          <td>
+            <button type="button" class="btn btn-success btn-xs" data-ng-click="reloadScreen(beat.id, apikey)">
+              <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reload
+            </button>
+            <button type="button" class="btn btn-danger btn-xs" data-ng-click="logoutScreen(beat.id, apikey)">
+              <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> logout
+            </button>
+          </td>
         </tr>
       </table>
     </div>
@@ -53,13 +61,15 @@
           <th>Id</th>
           <th>Title</th>
           <th>No. screens</th>
+          <th>Screens</th>
         </tr>
         </thead>
         <tr data-ng-repeat="channel in info">
           <td>{{ $index + 1 }}</td>
           <td>{{ channel.id }}</td>
           <td>{{ channel.title }}</td>
-          <td>{{ channel.screens }}</td>
+          <td>{{ channel.screens.length }}</td>
+          <td><span data-ng-repeat="screen in channel.screens">{{ screen }}{{$last ? '' : ', '}}</span></td>
           <td></td>
         </tr>
       </table>
