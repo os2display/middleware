@@ -126,7 +126,23 @@ module.exports = function (options, imports, register) {
     var profile = socket.client.request.decoded_token;
 
     // Log connection event.
-    logger.info('Socket: "' + profile.apikey + ':' + profile.screenID + '" connected.');
+    logger.socket("Connected " + profile.apikey + ' : ' + profile.screenID + ' : ' + socket.id);
+
+    // Capture all "emit" to log them.
+    socket.emitOrg = socket.emit;
+    socket.emit = function(ev) {
+      var args = Array.prototype.slice.call(arguments);
+      logger.socket('Emit <-> ' + ev + ' (' + profile.apikey + ' : ' + profile.screenID + ')', args);
+      socket.emitOrg.apply(socket, args);
+    }
+
+    // Capture all "on" to log them.
+    socket.onOrg = socket.on;
+    socket.on = function(ev) {
+      var args = Array.prototype.slice.call(arguments);
+      logger.socket('On <-> ' + ev + ' (' + profile.apikey + ' : ' + profile.screenID + ')', args);
+      socket.onOrg.apply(socket, args);
+    }
 
     // Create key to store socket under.
     var key = profile.apikey + ':' + profile.screenID;
@@ -139,7 +155,7 @@ module.exports = function (options, imports, register) {
       socketIO.remove(key);
 
       // Log dis-connection event.
-      logger.info('Socket: "' + profile.apikey + ':' + profile.screenID + '" disconnected .');
+      logger.socket("Disconnected " + profile.apikey + ' <-:-> ' + profile.screenID);
     });
   });
 

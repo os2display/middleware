@@ -23,6 +23,7 @@ var Logger = function Logger(logs) {
   winston.setLevels(levels);
 
   this.infoLog = new (winston.Logger)({
+    levels: levels,
     transports: [
       new (winston.transports.File)({
         name: 'info-file',
@@ -35,6 +36,7 @@ var Logger = function Logger(logs) {
   });
 
   this.errorLog = new (winston.Logger)({
+    levels: levels,
     transports: [
       new (winston.transports.File)({
         name: 'error-file',
@@ -47,6 +49,7 @@ var Logger = function Logger(logs) {
   });
 
   this.debugLog = new (winston.Logger)({
+    levels: levels,
     transports: [
       new (winston.transports.File)({
         name: 'debug-file',
@@ -59,6 +62,7 @@ var Logger = function Logger(logs) {
   });
 
   this.socketLog = new (winston.Logger)({
+    levels: levels,
     transports: [
       new (winston.transports.File)({
         name: 'socket-file',
@@ -70,19 +74,8 @@ var Logger = function Logger(logs) {
     exitOnError: false
   });
 
-  this.excepLog = new (winston.Logger)({
-    transports: [
-      new (winston.transports.File)({
-        name: 'exceptions-file',
-        filename: logs.exception,
-        handleExceptions: true,
-        humanReadableUnhandledException: true
-      })
-    ],
-    exitOnError: false
-  });
-
   this.allLog = new (winston.Logger)({
+    levels: levels,
     transports: [
       new (winston.transports.File)({
         name: 'all-file',
@@ -97,6 +90,18 @@ var Logger = function Logger(logs) {
     exitOnError: false
   });
 
+  this.excepLog = new (winston.Logger)({
+    levels: levels,
+    transports: [
+      new (winston.transports.File)({
+        name: 'exceptions-file',
+        filename: logs.exception,
+        handleExceptions: true,
+        humanReadableUnhandledException: true
+      })
+    ],
+    exitOnError: true
+  });
 };
 
 /**
@@ -144,11 +149,17 @@ Logger.prototype.debug = function debug(message) {
  * @param message
  *   The message to send to the logger.
  */
-Logger.prototype.socket = function socket(message) {
+Logger.prototype.socket = function socket(message, data) {
   "use strict";
 
-  this.debugLog.socket(message);
-  this.allLog.socket(message);
+  if (data !== undefined) {
+    this.socketLog.log('socket', message + ' <-:-> ', JSON.stringify(data));
+  }
+  else {
+      this.socketLog.log('socket', message);
+  }
+
+  this.allLog.log('socket', message);
 };
 
 /**
