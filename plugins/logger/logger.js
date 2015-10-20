@@ -9,9 +9,6 @@ var fs = require('fs');
 // NPM modules.
 var winston = require('winston');
 
-// Holds the log object.
-var log;
-
 /**
  * Define the Base object (constructor).
  */
@@ -22,86 +19,80 @@ var Logger = function Logger(logs) {
   levels['socket'] = 8;
   winston.setLevels(levels);
 
-  this.infoLog = new (winston.Logger)({
-    levels: levels,
-    transports: [
-      new (winston.transports.File)({
-        name: 'info-file',
-        filename: logs.info,
-        level: 'info',
-        colorize: false
-      })
-    ],
-    exitOnError: false
-  });
+  if (logs.hasOwnProperty('info')) {
+    this.infoLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new (winston.transports.File)({
+          name: 'info-file',
+          filename: logs.info,
+          level: 'info',
+          colorize: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
 
-  this.errorLog = new (winston.Logger)({
-    levels: levels,
-    transports: [
-      new (winston.transports.File)({
-        name: 'error-file',
-        filename: logs.error,
-        level: 'error',
-        colorize: false
-      })
-    ],
-    exitOnError: false
-  });
+  if (logs.hasOwnProperty('debug')) {
+    this.debugLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new (winston.transports.File)({
+          name: 'debug-file',
+          filename: logs.debug,
+          level: 'debug',
+          colorize: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
 
-  this.debugLog = new (winston.Logger)({
-    levels: levels,
-    transports: [
-      new (winston.transports.File)({
-        name: 'debug-file',
-        filename: logs.debug,
-        level: 'debug',
-        colorize: false
-      })
-    ],
-    exitOnError: false
-  });
+  if (logs.hasOwnProperty('error')) {
+    this.errorLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new (winston.transports.File)({
+          name: 'error-file',
+          filename: logs.error,
+          level: 'error',
+          colorize: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
 
-  this.socketLog = new (winston.Logger)({
-    levels: levels,
-    transports: [
-      new (winston.transports.File)({
-        name: 'socket-file',
-        filename: logs.socket,
-        level: 'socket',
-        colorize: false
-      })
-    ],
-    exitOnError: false
-  });
+  if (logs.hasOwnProperty('socket')) {
+    this.socketLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new (winston.transports.File)({
+          name: 'socket-file',
+          filename: logs.socket,
+          level: 'socket',
+          colorize: false
+        })
+      ],
+      exitOnError: false
+    });
+  }
 
-  this.allLog = new (winston.Logger)({
-    levels: levels,
-    transports: [
-      new (winston.transports.File)({
-        name: 'all-file',
-        filename: logs.all,
-        maxsize: 5242880, //5MB
-        maxFiles: 5,
-        json: false,
-        level: 'debug',
-        colorize: false
-      })
-    ],
-    exitOnError: false
-  });
-
-  this.excepLog = new (winston.Logger)({
-    levels: levels,
-    transports: [
-      new (winston.transports.File)({
-        name: 'exceptions-file',
-        filename: logs.exception,
-        handleExceptions: true,
-        humanReadableUnhandledException: true
-      })
-    ],
-    exitOnError: true
-  });
+  if (logs.hasOwnProperty('exception')) {
+    this.excepLog = new (winston.Logger)({
+      levels: levels,
+      transports: [
+        new (winston.transports.File)({
+          name: 'exceptions-file',
+          filename: logs.exception,
+          handleExceptions: true,
+          humanReadableUnhandledException: true
+        })
+      ],
+      exitOnError: true
+    });
+  }
 };
 
 /**
@@ -113,8 +104,9 @@ var Logger = function Logger(logs) {
 Logger.prototype.error = function error(message) {
   "use strict";
 
-  this.errorLog.error(message);
-  this.allLog.error(message);
+  if (this.errorLog !== undefined) {
+    this.errorLog.error(message);
+  }
 };
 
 /**
@@ -126,8 +118,9 @@ Logger.prototype.error = function error(message) {
 Logger.prototype.info = function info(message) {
   "use strict";
 
-  this.infoLog.info(message);
-  this.allLog.info(message);
+  if (this.infoLog !== undefined) {
+    this.infoLog.info(message);
+  }
 };
 
 /**
@@ -139,8 +132,9 @@ Logger.prototype.info = function info(message) {
 Logger.prototype.debug = function debug(message) {
   "use strict";
 
-  this.debugLog.debug(message);
-  this.allLog.debug(message);
+  if (this.debugLog !== undefined) {
+    this.debugLog.debug(message);
+  }
 };
 
 /**
@@ -152,14 +146,14 @@ Logger.prototype.debug = function debug(message) {
 Logger.prototype.socket = function socket(message, data) {
   "use strict";
 
-  if (data !== undefined) {
-    this.socketLog.log('socket', message + ' <-:-> ', JSON.stringify(data));
-  }
-  else {
+  if (this.socketLog !== undefined) {
+    if (data !== undefined) {
+      this.socketLog.log('socket', message + ' <-:-> ', JSON.stringify(data));
+    }
+    else {
       this.socketLog.log('socket', message);
+    }
   }
-
-  this.allLog.log('socket', message);
 };
 
 /**
