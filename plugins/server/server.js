@@ -27,7 +27,8 @@ module.exports = function (options, imports, register) {
   app.use(morgan('combined', {
     "stream": {
       "write": function (message, encoding) {
-        logger.info(message);
+        // Strip newlines from morgan.
+        logger.info(message.replace(/\n$/, ''));
       }
     }
   }));

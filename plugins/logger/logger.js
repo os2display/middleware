@@ -89,6 +89,8 @@ var Logger = function Logger(logs) {
         filename: logs.all,
         maxsize: 5242880, //5MB
         maxFiles: 5,
+        json: false,
+        level: 'debug',
         colorize: false
       })
     ],
