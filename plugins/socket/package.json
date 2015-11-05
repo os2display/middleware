@@ -15,7 +15,8 @@
     ],
     "consumes": [
       "logger",
-      "server"
+      "server",
+      "cache"
     ]
   }
 }

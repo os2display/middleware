@@ -108,7 +108,6 @@ module.exports = function (options, imports, register) {
             "screenID": value
           }, options.secret);
 
-
           // Activation code have been used before.
           res.status(409).send({
             "token": token,
@@ -166,7 +165,6 @@ module.exports = function (options, imports, register) {
           );
         }
       });
-
     }
     else {
       res.status(401).send('Activation code could not be validated.');
@@ -174,7 +172,7 @@ module.exports = function (options, imports, register) {
   });
 
   /**
-   * Screen: activate.
+   * Screen: kick.
    */
   app.post('/screen/kick', expressJwt({"secret": options.secret}), function (req, res) {
     // Check that the role is correct (kicker) is a role given in the activation code above.
@@ -192,7 +190,7 @@ module.exports = function (options, imports, register) {
     }
   });
 
-    // Register the plugin with the system.
+  // Register the plugin with the system.
   register(null, {
     'auth': {}
   });
