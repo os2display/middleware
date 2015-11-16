@@ -5,9 +5,11 @@
   "main": "logger.js",
   "private": true,
   "dependencies": {
-    "log" : "1.4.x"
+    "winston": "^1.1.1"
   },
   "plugin": {
-    "provides": [ "logger" ]
+    "provides": [
+      "logger"
+    ]
   }
 }

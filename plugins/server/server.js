@@ -26,7 +26,10 @@ module.exports = function (options, imports, register) {
   // Log express requests.
   app.use(morgan('combined', {
     "stream": {
-      "write": logger.info
+      "write": function (message, encoding) {
+        // Strip newlines from morgan.
+        logger.info(message.replace(/\n$/, ''));
+      }
     }
   }));
 

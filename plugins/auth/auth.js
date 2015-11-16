@@ -45,7 +45,7 @@ module.exports = function (options, imports, register) {
             }
 
             // API key accepted, so send back token.
-            var token = jwt.sign(profile, options.secret, { "expiresInMinutes": expire});
+            var token = jwt.sign(profile, options.secret, { "expiresIn": expire});
             res.json({'token': token});
           }
           else {
@@ -73,7 +73,7 @@ module.exports = function (options, imports, register) {
         };
 
         // Generate token for access.
-        var token = jwt.sign(profile, options.secret, {expiresInMinutes: 60 * 5});
+        var token = jwt.sign(profile, options.secret, {expiresIn: 60 * 60 * 5});
         res.json({
           'token': token
         });
@@ -107,7 +107,6 @@ module.exports = function (options, imports, register) {
             "apikey": apikey,
             "screenID": value
           }, options.secret);
-
 
           // Activation code have been used before.
           res.status(409).send({
@@ -166,7 +165,6 @@ module.exports = function (options, imports, register) {
           );
         }
       });
-
     }
     else {
       res.status(401).send('Activation code could not be validated.');
@@ -174,7 +172,7 @@ module.exports = function (options, imports, register) {
   });
 
   /**
-   * Screen: activate.
+   * Screen: kick.
    */
   app.post('/screen/kick', expressJwt({"secret": options.secret}), function (req, res) {
     // Check that the role is correct (kicker) is a role given in the activation code above.
@@ -192,7 +190,7 @@ module.exports = function (options, imports, register) {
     }
   });
 
-    // Register the plugin with the system.
+  // Register the plugin with the system.
   register(null, {
     'auth': {}
   });
