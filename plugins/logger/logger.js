@@ -5,6 +5,7 @@
 
 // Node core modules.
 var fs = require('fs');
+var path = require('path');
 
 // NPM modules.
 var winston = require('winston');
@@ -25,7 +26,7 @@ var Logger = function Logger(logs) {
       transports: [
         new (winston.transports.File)({
           name: 'info-file',
-          filename: logs.info,
+          filename: path.join(__dirname, logs.info),
           level: 'info',
           colorize: false
         })
@@ -40,7 +41,7 @@ var Logger = function Logger(logs) {
       transports: [
         new (winston.transports.File)({
           name: 'debug-file',
-          filename: logs.debug,
+          filename: path.join(__dirname, logs.debug),
           level: 'debug',
           colorize: false
         })
@@ -55,7 +56,7 @@ var Logger = function Logger(logs) {
       transports: [
         new (winston.transports.File)({
           name: 'error-file',
-          filename: logs.error,
+          filename: path.join(__dirname, logs.error),
           level: 'error',
           colorize: false
         })
@@ -70,7 +71,7 @@ var Logger = function Logger(logs) {
       transports: [
         new (winston.transports.File)({
           name: 'socket-file',
-          filename: logs.socket,
+          filename: path.join(__dirname, logs.socket),
           level: 'socket',
           colorize: false
         })
@@ -85,7 +86,7 @@ var Logger = function Logger(logs) {
       transports: [
         new (winston.transports.File)({
           name: 'exceptions-file',
-          filename: logs.exception,
+          filename: path.join(__dirname, logs.exception),
           handleExceptions: true,
           humanReadableUnhandledException: true
         })
