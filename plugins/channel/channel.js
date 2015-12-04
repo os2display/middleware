@@ -60,8 +60,9 @@ module.exports = function (options, imports, register) {
           deferred.resolve(self);
         }
         else {
-          self.logger.error('Channel: not found in cache (' + self.key + ') in load');
-          deferred.reject();
+          var msg = 'Channel: not found in cache (' + self.key + ') in load';
+          self.logger.error(msg);
+          deferred.reject({ "message" : msg });
         }
       }
     });
