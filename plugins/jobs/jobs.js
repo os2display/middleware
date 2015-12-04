@@ -29,7 +29,7 @@ Jobs.prototype.cacheCleanUp = function cacheCleanUp(message) {
 
   var self = this;
 
-  new CronJob('*/5 * * * * *', function() {
+  new CronJob('* * */1 * * *', function() {
 
     var apikey = '059d9d9c50e0c45b529407b183b6a02f';
     self.apikeys.load().then(
