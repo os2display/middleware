@@ -116,22 +116,22 @@ module.exports = function (options, imports, register) {
   Channel.prototype.remove = function remove() {
     var self = this;
 
-    if (self.screens !== undefined) {
-      // Remove cached channel.
-      self.cache.del(self.key, function (err, res) {
-        if (err) {
-          self.logger.error('Channel: redis encounted an error in del channel.');
-        }
-        else {
-          // Remove channel from channel set.
-          self.cache.removeSet('channel:' + self.apikey, self.id, function(err, res) {
-            if (err) {
-              self.logger.error('Channel: redis encounted an error in del channel set.');
-            }
+    // Remove cached channel.
+    self.cache.remove(self.key, function (err, res) {
+      if (err) {
+        self.logger.error('Channel: redis encounted an error in del channel.');
+      }
+      else {
+        // Remove channel from channel set.
+        self.cache.removeSet('channel:' + self.apikey, self.id, function(err, res) {
+          if (err) {
+            self.logger.error('Channel: redis encounted an error in del channel set.');
+          }
 
-            // We have to continue even if there is an error above, as the
-            // cached channel have been removed. Find screens that displays the
-            // channel and send removed event.
+          // We have to continue even if there is an error above, as the
+          // cached channel have been removed. Find screens that displays the
+          // channel and send removed event.
+          if (self.screens !== undefined) {
             for (var i in self.screens) {
               var screenID = self.screens[i];
               // Load screen.
@@ -146,13 +146,13 @@ module.exports = function (options, imports, register) {
                 }
               );
             }
-          });
-        }
-      });
-    }
-    else {
-      self.logger.error('Channel: remove failed as it did not contain any screens.');
-    }
+          }
+          else {
+            self.logger.error('Channel: remove failed as it did not contain any screens.');
+          }
+        });
+      }
+    });
   };
 
   /**

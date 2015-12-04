@@ -273,7 +273,6 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
           )
         }
       });
-
     }
     else {
       res.status(401).send('You do not have the right role.');

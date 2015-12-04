@@ -180,6 +180,12 @@ module.exports = function (options, imports, register) {
                 var screen = new Screen(profile.apikey, screenId);
                 screen.removeChannel(channelId);
 
+                // Check if channel is used by any one.
+                if (!channelObj.screens.length) {
+                  // It's not, so delete it.
+                  channelObj.remove();
+                }
+
                 // Send response back that we have send the event to the client.
                 res.sendStatus(200);
               },
