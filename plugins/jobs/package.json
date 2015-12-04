@@ -5,13 +5,14 @@
   "main": "jobs.js",
   "private": true,
   "dependencies": {
-    "cron": "^1.1.0",
-    "q": "^1.4.1"
+    "cron": "^1.1.0"
   },
   "plugin": {
     "consumes": [
       "cache",
-      "channel"
+      "screen",
+      "apikeys",
+      "logger"
     ],
     "provides": [
       "jobs"
