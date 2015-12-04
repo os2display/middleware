@@ -17,7 +17,6 @@ function cleanDeadScreens(self, apikey) {
 
   self.cache.membersOfSet('screen:' + apikey, function (err, screens) {
     if (err) {
-      console.log(err);
       self.logger.error(err.message);
     }
     else {
@@ -26,11 +25,15 @@ function cleanDeadScreens(self, apikey) {
         var sc = new self.screen(apikey, screens[i]);
         sc.load().then(
           function (screenObj) {
+            // @TODO: Make limit configurable (now 14 days with out contact)
+            // Calculate limit for when an screen should be removed.
             var limit = Math.round((new Date()).getTime() / 1000) - 1209600;
             if (screenObj.heartbeat === undefined) {
+              // Screen have never been connected.
               screenObj.remove();
             }
             else if (screenObj.heartbeat < limit) {
+              // Screen have not been seen for a long time.
               screenObj.remove();
             }
           },
@@ -55,23 +58,26 @@ var Jobs = function Jobs(cache, screen, apikeys, logger) {
   this.logger = logger;
 };
 
+/**
+ * Starts up cron jobs that cleans up the system state.
+ */
 Jobs.prototype.cacheCleanUp = function cacheCleanUp() {
   "use strict";
 
   var self = this;
 
-
-  new CronJob('*/5 * * * * *', function() {
+  // @TODO: Make job run configurable.
+  // Run job every hour.
+  new CronJob('* * */1 * * *', function() {
+    // Load all api keys.
     self.apikeys.load().then(
       function (keys) {
-        console.log(keys);
         keys = Object.keys(keys);
         for (var i = 0; i < keys.length; i++) {
-          console.log(keys[i]);
+          // Call clean dead screens to remove daed screens.
           cleanDeadScreens(self, keys[i]);
         }
       }, function (error) {
-        console.log('test3');
         self.logger.error(error.message);
       }
     );
@@ -84,6 +90,7 @@ Jobs.prototype.cacheCleanUp = function cacheCleanUp() {
 module.exports = function (options, imports, register) {
   "use strict";
 
+  // Get the clean up jobs running.
   var jobs = new Jobs(imports.cache, imports.screen, imports.apikeys, imports.logger);
   jobs.cacheCleanUp();
 
