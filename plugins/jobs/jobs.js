@@ -63,7 +63,7 @@ function cleanDeadScreens(apikey) {
     else {
       // Loop over screens and build promises array.
       for (var i in screens) {
-        var sc = new self.screen(apikey, screenId);
+        var sc = new self.screen(apikey, screens[i]);
         sc.load().then(
           function (screenObj) {
             var limit = Math.round((new Date()).getTime() / 1000) - 1209600;
