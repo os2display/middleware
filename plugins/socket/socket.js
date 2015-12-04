@@ -125,6 +125,9 @@ module.exports = function (options, imports, register) {
     // Get the JWT decoded token.
     var profile = socket.client.request.decoded_token;
 
+    // Create key to store socket under.
+    var key = profile.apikey + ':' + profile.screenID;
+
     // Check if activation code is in use or has been used.
     imports.cache.hashGet('activation:' + profile.apikey, profile.activationCode, function(error, value) {
       if (value === null) {
@@ -134,19 +137,32 @@ module.exports = function (options, imports, register) {
           if (error) {
             logger.error('Auth: Activation code hash could not be updated.');
           }
+          else {
+            // No activation error, so carry on.
+            registerSocket(socket, key, profile);
+          }
         });
       }
       else {
         // Check if the registred screen is different that the one in the cache.
-        if (Number(value) !== profile.screenID) {
+        if (socketIO.get(profile.apikey, profile.screenID)) {
           // It is a nother screen to don't connect, kick it.
           logger.info('Screen tried to re-connect with used activation code: ' + profile.activationCode + ', apikey: ' + profile.apikey + ', screen id: ' + profile.screenID)
           socket.emit('booted', {"statusCode": 404});
           socket.disconnect();
         }
+        else {
+          // No conflict in key usage, so lets carry on.
+          registerSocket(socket, key, profile);
+        }
       }
     });
+  });
 
+  /**
+   * Register information about the socket and add event listeners.
+   */
+  function registerSocket(socket, key, profile) {
     // Log connection event.
     logger.socket("Connected " + profile.apikey + ' : ' + profile.screenID + ' : ' + socket.id);
 
@@ -166,9 +182,6 @@ module.exports = function (options, imports, register) {
       socket.onOrg.apply(socket, args);
     }
 
-    // Create key to store socket under.
-    var key = profile.apikey + ':' + profile.screenID;
-
     // Add socket to store.
     socketIO.add(key, socket);
 
@@ -179,7 +192,7 @@ module.exports = function (options, imports, register) {
       // Log dis-connection event.
       logger.socket("Disconnected " + profile.apikey + ' <-:-> ' + profile.screenID);
     });
-  });
+  }
 
   // Register exposed function with architect.
   register(null, {

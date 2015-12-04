@@ -35,6 +35,7 @@ module.exports = function (options, imports, register) {
       screen.load().then(
         function (screenObj) {
           screenObj.title = profile.screenTitle;
+          screenObj.heartbeat = Math.round((new Date()).getTime() / 1000);
           screenObj.save().then(
             function () {
               // Send a 200 ready code back to the client with information about
