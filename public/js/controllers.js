@@ -313,6 +313,13 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
     }
 
     /**
+     * Return TURE if timestamp is older than 10 min else FALSE.
+     */
+    $scope.expired = function expired(timestamp) {
+      return timestamp < Math.round((new Date()).getTime() / 1000) - 900;
+    }
+
+    /**
      * Refresh heartbeats callback.
      */
     $scope.refreshBeats = function refreshBeats() {

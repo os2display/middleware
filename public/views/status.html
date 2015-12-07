@@ -27,7 +27,7 @@
           <th>Action</th>
         </tr>
         </thead>
-        <tr data-ng-repeat="beat in beats">
+        <tr data-ng-class="{ 'red': expired(beat.heartbeat) }" data-ng-repeat="beat in beats">
           <td>{{ $index + 1 }}</td>
           <td>{{ beat.id }}</td>
           <td>{{ beat.title }}</td>
