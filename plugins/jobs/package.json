@@ -1,0 +1,21 @@
+{
+  "name": "Jobs",
+  "description": "Run cron jobs",
+  "version": "0.0.1",
+  "main": "jobs.js",
+  "private": true,
+  "dependencies": {
+    "cron": "^1.1.0"
+  },
+  "plugin": {
+    "consumes": [
+      "cache",
+      "screen",
+      "apikeys",
+      "logger"
+    ],
+    "provides": [
+      "jobs"
+    ]
+  }
+}
