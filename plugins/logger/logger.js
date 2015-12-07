@@ -24,10 +24,11 @@ var Logger = function Logger(logs) {
     this.infoLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new (winston.transports.File)({
+        new (winston.transports.DailyRotateFile)({
           name: 'info-file',
           filename: path.join(__dirname, '../../' + logs.info),
           level: 'info',
+          datePattern: '.dd-MM-yyTHH',
           colorize: false
         })
       ],
@@ -39,10 +40,11 @@ var Logger = function Logger(logs) {
     this.debugLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new (winston.transports.File)({
+        new (winston.transports.DailyRotateFile)({
           name: 'debug-file',
           filename: path.join(__dirname, '../../' + logs.debug),
           level: 'debug',
+          datePattern: '.dd-MM-yyTHH',
           colorize: false
         })
       ],
@@ -54,10 +56,11 @@ var Logger = function Logger(logs) {
     this.errorLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new (winston.transports.File)({
+        new (winston.transports.DailyRotateFile)({
           name: 'error-file',
           filename: path.join(__dirname, '../../' + logs.error),
           level: 'error',
+          datePattern: '.dd-MM-yyTHH',
           colorize: false
         })
       ],
@@ -69,10 +72,11 @@ var Logger = function Logger(logs) {
     this.socketLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new (winston.transports.File)({
+        new (winston.transports.DailyRotateFile)({
           name: 'socket-file',
           filename: path.join(__dirname, '../../' + logs.socket),
           level: 'socket',
+          datePattern: '.dd-MM-yyTHH',
           colorize: false
         })
       ],
@@ -84,9 +88,10 @@ var Logger = function Logger(logs) {
     this.excepLog = new (winston.Logger)({
       levels: levels,
       transports: [
-        new (winston.transports.File)({
+        new (winston.transports.DailyRotateFile)({
           name: 'exceptions-file',
           filename: path.join(__dirname, '../../' + logs.exception),
+          datePattern: '.dd-MM-yyTHH',
           handleExceptions: true,
           humanReadableUnhandledException: true
         })
