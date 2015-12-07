@@ -70,3 +70,7 @@ legend {
 .btn-remove-center {
   padding-top: 6px;
 }
+
+.red {
+  background-color: #D9534F;
+}
