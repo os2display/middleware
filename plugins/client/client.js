@@ -19,21 +19,16 @@ module.exports = function (options, imports, register) {
   var cache = imports.cache;
   var Channel = imports.channel;
 
-  // Local variables
-  var profile;
-
   /**
    * Handle socket connection event from a client.
    */
   socketIO.on('connection', function (socket) {
-    // Get the JWT decoded token.
-    profile = socket.client.request.decoded_token;
-
     /**
      * Ready event.
      */
     socket.on('ready', function () {
-      console.log('ready: ' + socket.id);
+      // Get the JWT decoded token.
+      var profile = socket.client.request.decoded_token;
 
       // Create key to store socket under.
       var key = profile.apikey + ':' + profile.screenID;
@@ -50,7 +45,7 @@ module.exports = function (options, imports, register) {
             else {
               // No activation error, so carry on.
               registerSocket(socket, key, profile);
-              handleSocketCommunication(socket);
+              handleSocketCommunication(socket, profile);
             }
           });
         }
@@ -68,7 +63,7 @@ module.exports = function (options, imports, register) {
           else {
             // No conflict in key usage, so lets carry on.
             registerSocket(socket, key, profile);
-            handleSocketCommunication(socket);
+            handleSocketCommunication(socket, profile);
           }
         }
       });
@@ -78,7 +73,7 @@ module.exports = function (options, imports, register) {
   /**
    * Handle socket communication after socket connection have been approved.
    */
-  function handleSocketCommunication(socket) {
+  function handleSocketCommunication(socket, profile) {
     // Try to get the screen.
     var screen = new Screen(profile.apikey, profile.screenID, profile.activationCode);
     screen.load().then(
