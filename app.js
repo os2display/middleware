@@ -19,6 +19,9 @@ var config = [
     "logs": configs.logs
   },
   {
+    "packagePath": "./plugins/jobs"
+  },
+  {
     "packagePath": "./plugins/server",
     "port": configs.port,
     "path": path.join(__dirname, 'public')
