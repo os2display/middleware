@@ -360,6 +360,7 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
         function (data) {
           $scope.message = 'Sent logout message to screen (' + screenId + ').';
           $scope.messageClass = 'alert-success';
+          $scope.refreshBeats();
         },
         function (reason) {
           $scope.message = reason.message;

@@ -330,7 +330,7 @@ var Admin = function Admin(app, logger, apikeys, cache, Screen, Channel, options
    */
   app.get('/api/admin/:apikey/screen/:id/logout', this.expressJwt({"secret": options.secret}), function (req, res) {
     if (self.validateCall(req)) {
-      var screen = new Screen(req.params.apikey, req.params.id. req.user.activationCode);
+      var screen = new Screen(req.params.apikey, req.params.id, null);
       screen.remove().then(
         function () {
           res.sendStatus(200);

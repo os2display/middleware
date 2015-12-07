@@ -68,7 +68,7 @@ Jobs.prototype.cacheCleanUp = function cacheCleanUp() {
 
   // @TODO: Make job run configurable.
   // Run job every hour.
-  new CronJob('* * 0 * * *', function() {
+  new CronJob('0 0 * * * *', function() {
     console.log('test');
     // Load all api keys.
     self.apikeys.load().then(
