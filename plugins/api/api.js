@@ -41,12 +41,12 @@ module.exports = function (options, imports, register) {
     /**
      * Screen: deactivate.
      */
-    this.app.delete('/api/screen/:id', expressJwt({"secret": options.secret}), function (req, res) {
+    this.app.delete('/api/screen/:id/:activationCode', expressJwt({"secret": options.secret}), function (req, res) {
       var profile = req.user;
 
       if (req.params.hasOwnProperty('id')) {
         // Load screen.
-        var screen = new Screen(profile.apikey, req.params.id);
+        var screen = new Screen(profile.apikey, req.params.id, req.params.activationCode);
         screen.load().then(
           function (obj) {
             obj.remove().then(
