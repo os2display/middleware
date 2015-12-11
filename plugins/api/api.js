@@ -41,7 +41,7 @@ module.exports = function (options, imports, register) {
     /**
      * Screen: deactivate.
      */
-    this.app.delete('/api/screen/:id', function (req, res) {
+    this.app.delete('/api/screen/:id', expressJwt({"secret": options.secret}), function (req, res) {
       var profile = req.user;
 
       if (req.params.hasOwnProperty('id')) {
