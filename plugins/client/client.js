@@ -33,40 +33,21 @@ module.exports = function (options, imports, register) {
       // Create key to store socket under.
       var key = profile.apikey + ':' + profile.screenID;
 
-      // Check if activation code is in use or has been used.
-      imports.cache.hashGet('activation:' + profile.apikey, profile.activationCode, function(error, value) {
-        if (value === null) {
-          // Store the activation code in a hash table use to ensure that no more
-          // than one screen exists for that activation code.
-          imports.cache.hashSet('activation:' + profile.apikey, profile.activationCode, profile.screenID, function(error, res) {
-            if (error) {
-              logger.error('Auth: Activation code hash could not be updated.');
-            }
-            else {
-              // No activation error, so carry on.
-              registerSocket(socket, key, profile);
-              handleSocketCommunication(socket, profile);
-            }
-          });
-        }
-        else {
-          // Get last knonw socket for this screen.
-          var cachedSocket = socketIO.get(profile.apikey, profile.screenID);
+      // Get last knonw socket for this screen.
+      var cachedSocket = socketIO.get(profile.apikey, profile.screenID);
 
-          // Check if the registred screen is different that the one in the cache.
-          if (cachedSocket && cachedSocket.id !== socket.id) {
-            // It is a nother screen to don't connect, kick it.
-            logger.info('Screen tried to re-connect with used activation code: ' + profile.activationCode + ', apikey: ' + profile.apikey + ', screen id: ' + profile.screenID)
-            socket.emit('booted', {"statusCode": 404});
-            socket.disconnect();
-          }
-          else {
-            // No conflict in key usage, so lets carry on.
-            registerSocket(socket, key);
-            handleSocketCommunication(socket, profile, key);
-          }
-        }
-      });
+      // Check if the registred screen is different that the one in the cache.
+      if (cachedSocket && cachedSocket.id !== socket.id) {
+        // It is a nother screen to don't connect, kick it.
+        logger.info('Screen tried to re-connect with used activation code: ' + profile.activationCode + ', apikey: ' + profile.apikey + ', screen id: ' + profile.screenID)
+        socket.emit('booted', {"statusCode": 404});
+        socket.disconnect();
+      }
+      else {
+        // No conflict in socket usage, so lets carry on.
+        registerSocket(socket, key);
+        handleSocketCommunication(socket, profile, key);
+      }
     });
   });
 

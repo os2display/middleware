@@ -129,7 +129,8 @@ module.exports = function (options, imports, register) {
   socketIO.on('connection', function (socket) {
     // Capture all "emit" to log them.
     socket.emitOrg = socket.emit;
-    socket.emit = function(ev) {
+    socket.emit = function emit(ev) {
+      //console.log('Emit: ' + ev + ' : ' + socket.id);
       var profile = socket.client.request.decoded_token;
       var args = Array.prototype.slice.call(arguments);
       logger.socket('Emit <-> ' + ev + ' (' + profile.apikey + ' : ' + profile.screenID + ')', args);
@@ -138,7 +139,8 @@ module.exports = function (options, imports, register) {
 
     // Capture all "on" to log them.
     socket.onOrg = socket.on;
-    socket.on = function(ev) {
+    socket.on = function on(ev) {
+      //console.log('On: ' + ev + ' : ' + socket.id);
       var profile = socket.client.request.decoded_token;
       var args = Array.prototype.slice.call(arguments);
       logger.socket('On <-> ' + ev + ' (' + profile.apikey + ' : ' + profile.screenID + ')', args);
