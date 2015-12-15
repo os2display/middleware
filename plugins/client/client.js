@@ -47,6 +47,14 @@ module.exports = function (options, imports, register) {
         // No conflict in socket usage, so lets carry on.
         registerSocket(socket, key);
         handleSocketCommunication(socket, profile, key);
+
+        // Update the activation cache with the code used. This is to rebuild
+        // the cache after an cache clear.
+        imports.cache.hashSet('activation:' + profile.apikey, profile.activationCode, profile.screenID, function(error, res) {
+          if (error) {
+            imports.logger.error('Auth: Activation code hash could not be updated.');
+          }
+        });
       }
     });
   });
