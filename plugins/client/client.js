@@ -62,8 +62,8 @@ module.exports = function (options, imports, register) {
           }
           else {
             // No conflict in key usage, so lets carry on.
-            registerSocket(socket, key, profile);
-            handleSocketCommunication(socket, profile);
+            registerSocket(socket, key);
+            handleSocketCommunication(socket, profile, key);
           }
         }
       });
@@ -73,7 +73,7 @@ module.exports = function (options, imports, register) {
   /**
    * Handle socket communication after socket connection have been approved.
    */
-  function handleSocketCommunication(socket, profile) {
+  function handleSocketCommunication(socket, profile, key) {
     // Try to get the screen.
     var screen = new Screen(profile.apikey, profile.screenID, profile.activationCode);
     screen.load().then(
@@ -183,6 +183,14 @@ module.exports = function (options, imports, register) {
       );
     });
 
+    // Listen to disconnect and remove socket from store.
+    socket.on('disconnect', function() {
+      socketIO.remove(key);
+
+      // Log dis-connection event.
+      logger.socket("Disconnected " + profile.apikey + ' <-:-> ' + profile.screenID);
+    });
+
     /**
     * Heartbeat event.
     *
@@ -205,17 +213,9 @@ module.exports = function (options, imports, register) {
   /**
    * Register information about the socket and add event listeners.
    */
-  function registerSocket(socket, key, profile) {
+  function registerSocket(socket, key) {
     // Add socket to store.
     socketIO.add(key, socket);
-
-    // Listen to disconnect and remove socket from store.
-    socket.on('disconnect', function() {
-      socketIO.remove(key);
-
-      // Log dis-connection event.
-      logger.socket("Disconnected " + profile.apikey + ' <-:-> ' + profile.screenID);
-    });
   }
 
   // Register the plugin with the system.
