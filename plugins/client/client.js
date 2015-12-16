@@ -37,7 +37,7 @@ module.exports = function (options, imports, register) {
       var cachedSocket = socketIO.get(profile.apikey, profile.screenID);
 
       // Check if the registred screen is different that the one in the cache.
-      if (cachedSocket && cachedSocket.id !== socket.id) {
+      if (cachedSocket && cachedSocket.handshake.query.uuid !== socket.handshake.query.uuid) {
         // It is a nother screen to don't connect, kick it.
         logger.info('Screen tried to re-connect with used activation code: ' + profile.activationCode + ', apikey: ' + profile.apikey + ', screen id: ' + profile.screenID)
         socket.emit('booted', {"statusCode": 404});
