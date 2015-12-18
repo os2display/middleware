@@ -33,47 +33,36 @@ module.exports = function (options, imports, register) {
       // Create key to store socket under.
       var key = profile.apikey + ':' + profile.screenID;
 
-      // Check if activation code is in use or has been used.
-      imports.cache.hashGet('activation:' + profile.apikey, profile.activationCode, function(error, value) {
-        if (value === null) {
-          // Store the activation code in a hash table use to ensure that no more
-          // than one screen exists for that activation code.
-          imports.cache.hashSet('activation:' + profile.apikey, profile.activationCode, profile.screenID, function(error, res) {
-            if (error) {
-              logger.error('Auth: Activation code hash could not be updated.');
-            }
-            else {
-              // No activation error, so carry on.
-              registerSocket(socket, key, profile);
-              handleSocketCommunication(socket, profile);
-            }
-          });
-        }
-        else {
-          // Get last knonw socket for this screen.
-          var cachedSocket = socketIO.get(profile.apikey, profile.screenID);
+      // Get last knonw socket for this screen.
+      var cachedSocket = socketIO.get(profile.apikey, profile.screenID);
 
-          // Check if the registred screen is different that the one in the cache.
-          if (cachedSocket && cachedSocket.id !== socket.id) {
-            // It is a nother screen to don't connect, kick it.
-            logger.info('Screen tried to re-connect with used activation code: ' + profile.activationCode + ', apikey: ' + profile.apikey + ', screen id: ' + profile.screenID)
-            socket.emit('booted', {"statusCode": 404});
-            socket.disconnect();
+      // Check if the registred screen is different that the one in the cache.
+      if (cachedSocket && cachedSocket.handshake.query.uuid !== socket.handshake.query.uuid) {
+        // It is a nother screen to don't connect, kick it.
+        logger.info('Screen tried to re-connect with used activation code: ' + profile.activationCode + ', apikey: ' + profile.apikey + ', screen id: ' + profile.screenID)
+        socket.emit('booted', {"statusCode": 404});
+        socket.disconnect();
+      }
+      else {
+        // No conflict in socket usage, so lets carry on.
+        registerSocket(socket, key);
+        handleSocketCommunication(socket, profile, key);
+
+        // Update the activation cache with the code used. This is to rebuild
+        // the cache after an cache clear.
+        imports.cache.hashSet('activation:' + profile.apikey, profile.activationCode, profile.screenID, function(error, res) {
+          if (error) {
+            imports.logger.error('Auth: Activation code hash could not be updated.');
           }
-          else {
-            // No conflict in key usage, so lets carry on.
-            registerSocket(socket, key, profile);
-            handleSocketCommunication(socket, profile);
-          }
-        }
-      });
+        });
+      }
     });
   });
 
   /**
    * Handle socket communication after socket connection have been approved.
    */
-  function handleSocketCommunication(socket, profile) {
+  function handleSocketCommunication(socket, profile, key) {
     // Try to get the screen.
     var screen = new Screen(profile.apikey, profile.screenID, profile.activationCode);
     screen.load().then(
@@ -183,6 +172,14 @@ module.exports = function (options, imports, register) {
       );
     });
 
+    // Listen to disconnect and remove socket from store.
+    socket.on('disconnect', function() {
+      socketIO.remove(key);
+
+      // Log dis-connection event.
+      logger.socket("Disconnected " + profile.apikey + ' <-:-> ' + profile.screenID);
+    });
+
     /**
     * Heartbeat event.
     *
@@ -205,17 +202,9 @@ module.exports = function (options, imports, register) {
   /**
    * Register information about the socket and add event listeners.
    */
-  function registerSocket(socket, key, profile) {
+  function registerSocket(socket, key) {
     // Add socket to store.
     socketIO.add(key, socket);
-
-    // Listen to disconnect and remove socket from store.
-    socket.on('disconnect', function() {
-      socketIO.remove(key);
-
-      // Log dis-connection event.
-      logger.socket("Disconnected " + profile.apikey + ' <-:-> ' + profile.screenID);
-    });
   }
 
   // Register the plugin with the system.
