@@ -27,15 +27,89 @@ module.exports = function (options, imports, register) {
     // Injections.
     this.app = imports.app;
     this.logger = imports.logger;
+    this.cache = imports.cache;
+    this.Q = require('q');
 
     // Ref the object.
     var self = this;
+
+    /**
+    * Helper function to load a channel
+    *
+    * @param apikey
+    *   API-key for the channel to load.
+    * @param channelId
+    *   The ID of the channel to load.
+    *
+    * @returns {*}
+    */
+    function loadChannel(apikey, channelId) {
+      var deferred = self.Q.defer();
+
+      var channel = new Channel(apikey, channelId);
+      channel.load().then(
+        function (channelObj) {
+          deferred.resolve({
+            "id": channelObj.id,
+            "title": channelObj.title,
+            "screens": channelObj.screens
+          });
+        },
+        function (error) {
+          self.logger.error(error.message);
+          deferred.reject(error.message);
+        }
+      );
+
+      return deferred.promise;
+    }
 
     /**
      * Default get request.
      */
     this.app.get('/api', expressJwt({"secret": options.secret}), function (req, res) {
       res.send('Please see documentation about using this api.');
+    });
+
+    /**
+    * Get status for all channels.
+    */
+    this.app.get('/api/status/channels/:apikey', expressJwt({'secret': options.secret}), function (req, res) {
+      var apikey = req.params.apikey;
+      var data = {
+        'apikey': apikey,
+        'channels': []
+      };
+
+      self.cache.membersOfSet('channel:' + apikey, function (err, channels) {
+        if (err) {
+          self.logger.error(err.message);
+        }
+        else {
+          // Start promise group to load all channels under the api-key.
+          self.Q()
+            .then(function () {
+              var channelPromises = [];
+
+              // Loop over channels and build promises array.
+              for (var i in channels) {
+                channelPromises.push(loadChannel(apikey, channels[i]));
+              }
+
+              return channelPromises;
+            })
+            .all()
+            .then(
+              function (results) {
+                data.channels = results;
+                res.send(data);
+              },
+              function (error) {
+                res.status(500).send(error.message);
+              }
+            );
+        }
+      });
     });
 
     /**

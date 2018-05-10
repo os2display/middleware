@@ -12,6 +12,7 @@
     "consumes": [
       "app",
       "logger",
+      "cache",
       "channel",
       "screen"
     ]
