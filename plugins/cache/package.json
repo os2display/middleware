@@ -5,7 +5,7 @@
   "main": "cache.js",
   "private": true,
   "dependencies": {
-    "redis": "0.12.x"
+    "redis": "2.8.x"
   },
   "plugin": {
     "provides": [
