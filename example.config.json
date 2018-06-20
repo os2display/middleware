@@ -5,7 +5,6 @@
     "info": "logs/info.log",
     "error": "logs/error.log",
     "debug": "logs/debug.log",
-    "exception": "logs/exception.log",
     "socket": "logs/socket.log"
   },
   "admin": {
