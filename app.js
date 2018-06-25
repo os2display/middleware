@@ -59,6 +59,10 @@ var config = [
   {
     "packagePath": "./plugins/api",
     "secret": configs.secret
+  },
+  {
+    "packagePath": "./plugins/dashboard",
+    "secret": configs.secret
   }
 ];
 
