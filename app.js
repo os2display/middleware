@@ -62,7 +62,8 @@ var config = [
   },
   {
     "packagePath": "./plugins/dashboard",
-    "secret": configs.secret
+    "htpasswd": configs.dashboard.htpasswd,
+    "blacklist": configs.dashboard.blacklist
   }
 ];
 
