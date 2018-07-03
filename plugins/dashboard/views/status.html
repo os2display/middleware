@@ -33,12 +33,16 @@
 {% if not screens.critical is empty %}
   <div class="row no-gutters critical">
     <table class="table text-danger">
+      <col style="width:5%">
+      <col style="width:18%">
+      <col style="width:10%">
+      <col style="width:67%">
       <thead>
       <tr>
         <th>Id</th>
         <th>Last beat</th>
-        <th>Screen</th>
         <th>Installation</th>
+        <th>Screen</th>
       </tr>
       </thead>
       <tbody>
@@ -47,8 +51,8 @@
             <tr>
               <td>{{ screen.id }}</td>
               <td>{{ screen.heartbeat }}</td>
-              <td>{{ screen.title }}</td>
               <td>{{ screen.name }}</td>
+              <td>{{ screen.title }}</td>
             </tr>
           {% endfor %}
         {% endfor %}
@@ -57,9 +61,6 @@
   </div>
 {% endif %}
 
-<!--<?php if (!$hasCritical && !$hasNotification) : ?>-->
-<!--<img src="<?php print $okImage; ?>">-->
-<!--<?php endif; ?>-->
 <div class="footer">
   <div class="row no-gutters footer--inner">
     <div class="col-8 col-offset-2 mx-auto summed-updates">

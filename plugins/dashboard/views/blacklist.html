@@ -4,14 +4,6 @@
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="/css/dashboard.css" media="all">
 <body>
-<div class="row no-gutters">
-  <div class="col">
-    <div class="timer--wrapper">
-      <div class="timer" id="timer">
-      </div>
-    </div>
-  </div>
-</div>
 <div class="row no-gutters header--inner align-items-center">
   <div class="col-3">
     <img src="/img/dashboard_logo.svg" class="logo">
@@ -24,16 +16,38 @@
 </div>
 
 <div class="row no-gutters critical">
-    
+  {% for key,data in screens.all %}
+    <h4>IK3</h4><span class="apikey">({{ key }})</span>
+    <table class="table">
+      <col style="width:5%">
+      <col style="width:10%">
+      <col style="width:20%">
+      <col style="width:65%">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>Black listed</th>
+        <th>Last beat</th>
+        <th>Name</th>
+      </tr>
+      </thead>
+      <tbody>
+          {% for screen in data %}
+            <tr>
+              <td>{{ screen.id }}</td>
+              <td><input type="checkbox" name="{{ key }}-{{ screen.id }}"></td>
+              <td>{{ screen.heartbeat }}</td>
+              <td>{{ screen.title }}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+  {% endfor %}
 </div>
-
-<!--<?php if (!$hasCritical && !$hasNotification) : ?>-->
-<!--<img src="<?php print $okImage; ?>">-->
-<!--<?php endif; ?>-->
-<div class="footer">
-  <div class="row no-gutters footer--inner">
-    <div class="col-8 col-offset-2 mx-auto summed-updates">
-      
+<div class="row no-gutters">
+  <div class="col">
+    <div class="save-wrapper">
+      <input class="save" type="button" name="Save" value="Save blacklist">
     </div>
   </div>
 </div>

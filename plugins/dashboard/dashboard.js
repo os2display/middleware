@@ -119,6 +119,9 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
   });
 };
 
+/**
+ * Helper function to async load all information about screens known to the middleware.
+ */
 Dashboard.prototype.buildScreenData = function buildScreenData() {
   var self = this;
   var deferred = self.Q.defer();
@@ -179,10 +182,11 @@ Dashboard.prototype.buildScreenData = function buildScreenData() {
     },
     function (error) {
       deferred.reject(error);
-    });
+    }
+  );
 
-    return deferred.promise;
-  }
+  return deferred.promise;
+}
 
 /**
  * Helper function to load a screen.
