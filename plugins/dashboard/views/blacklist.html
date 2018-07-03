@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="/css/dashboard.css" media="all">
+<script type="text/javascript" src="/js/lib/jquery-1.11.1.min.js"></script>
 <body>
 <div class="row no-gutters header--inner align-items-center">
   <div class="col-3">
@@ -15,44 +16,74 @@
   </div>
 </div>
 
-<div class="row no-gutters critical">
-  {% for key,data in screens.all %}
-    <h4>IK3</h4><span class="apikey">({{ key }})</span>
-    <table class="table">
-      <col style="width:5%">
-      <col style="width:10%">
-      <col style="width:20%">
-      <col style="width:65%">
-      <thead>
-      <tr>
-        <th>Id</th>
-        <th>Black listed</th>
-        <th>Last beat</th>
-        <th>Name</th>
-      </tr>
-      </thead>
-      <tbody>
-          {% for screen in data %}
-            <tr>
-              <td>{{ screen.id }}</td>
-              <td><input type="checkbox" name="{{ key }}-{{ screen.id }}"></td>
-              <td>{{ screen.heartbeat }}</td>
-              <td>{{ screen.title }}</td>
-            </tr>
-          {% endfor %}
-      </tbody>
-    </table>
-  {% endfor %}
-</div>
-<div class="row no-gutters">
-  <div class="col">
-    <div class="save-wrapper">
-      <input class="save" type="button" name="Save" value="Save blacklist">
+<form name="blacklist" action="#">
+  <div class="row no-gutters critical">
+    {% for key,data in screens.all %}
+      <h4>IK3</h4><span class="apikey">({{ key }})</span>
+      <table class="table">
+        <col style="width:5%">
+        <col style="width:10%">
+        <col style="width:20%">
+        <col style="width:65%">
+        <thead>
+        <tr>
+          <th>Id</th>
+          <th>Black listed</th>
+          <th>Last beat</th>
+          <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for screen in data %}
+              <tr>
+                <td>{{ screen.id }}</td>
+                <td><input type="checkbox" {% if blacklist[key].includes(screen.id) %}checked{% endif %} name="{{ key }}-{{ screen.id }}"></td>
+                <td>{{ screen.heartbeat }}</td>
+                <td>{{ screen.title }}</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </div>
+
+  <div class="row no-gutters">
+    <div class="col">
+      <div class="save-wrapper">
+        <input class="save" type="button" name="Save" value="Save blacklist">
+      </div>
     </div>
   </div>
-</div>
+</form>
+
 <script>
-  
+  $(document).ready(function ready() {
+    $('.save').click(function click() {
+      var blacklist = [];
+      $('input:checked').each(function (index, element) {
+        var name = $(element).attr('name');
+        var i = name.indexOf('-');
+        blacklist.push({
+          'apikey': name.substring(0, i),
+          'id': name.substring(i + 1)
+        });
+      });
+
+      $.ajax({
+        type: 'POST',
+        url: '/dashboard/blacklist/save',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify(blacklist),
+        success: function() {
+          alert('Black list was saved');
+        },
+        error: function() {
+          alert('Black list was NOT saved');
+        }
+      });
+    });
+  })
 </script>
 </body>
 </html>
