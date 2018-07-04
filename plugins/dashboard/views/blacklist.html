@@ -1,9 +1,11 @@
 <html>
-<title>Dashboard</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="/css/dashboard.css" media="all">
-<script type="text/javascript" src="/js/lib/jquery-1.11.1.min.js"></script>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/css/dashboard.css" media="all">
+  <script type="text/javascript" src="/js/lib/jquery-1.11.1.min.js"></script>
+</head>
 <body>
 <div class="row no-gutters header--inner align-items-center">
   <div class="col-3">
@@ -19,7 +21,7 @@
 <form name="blacklist" action="#">
   <div class="row no-gutters critical">
     {% for key,data in screens.all %}
-      <h4>IK3</h4><span class="apikey">({{ key }})</span>
+      <h4>{{ data[0].name }}</h4><span class="apikey">({{ key }})</span>
       <table class="table">
         <col style="width:5%">
         <col style="width:10%">
@@ -29,7 +31,7 @@
         <tr>
           <th>Id</th>
           <th>Black listed</th>
-          <th>Last beat</th>
+          <th>Last heartbeat</th>
           <th>Name</th>
         </tr>
         </thead>
