@@ -175,7 +175,8 @@ Dashboard.prototype.buildScreenData = function buildScreenData() {
       total: 0,
       critical: 0,
       blacklist: 0
-    }
+    },
+    expire: self.config.expire
   };
 
   // First load the blacklist, then load api keys and then loop over the api keys
@@ -295,7 +296,8 @@ Dashboard.prototype.loadScreen = function loadScreen(apikey, name, screenId) {
  *   TRUE if expired else FALSE.
  */
 Dashboard.prototype.expired = function expired(timestamp) {
-  return timestamp < Math.round((new Date()).getTime() / 1000) - 900;
+  var self = this;
+  return timestamp < Math.round((new Date()).getTime() / 1000) - self.config.expire;
 };
 
 /**

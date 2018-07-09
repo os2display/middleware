@@ -20,7 +20,8 @@
   },
   "dashboard": {
     "htpasswd": "dashboard.htpasswd",
-    "blacklist": "blacklist.json"
+    "blacklist": "blacklist.json",
+    "expire": 900
   },
   "apikeys": "apikeys.json",
 }
