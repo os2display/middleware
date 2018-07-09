@@ -83,6 +83,20 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
   });
 
   /**
+   * Dashboard index page.
+   */
+  app.get('/dashboard', self.auth, function (req, res) {
+    // Create local every time to not use global memory for the template.
+    var template = twig.twig({
+      data: fs.readFileSync(__dirname + '/views/dashboard.html', 'utf8')
+    });
+
+    res.send(template.render({
+      page_title: 'Dashboard'
+    }));
+  });
+
+  /**
    * Dashboard status callback.
    */
   app.get('/dashboard/status', self.auth, function (req, res) {
@@ -116,6 +130,7 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
     self.buildScreenData().then(function (screens) {
       self.load().then(function (blacklist) {
         res.send(template.render({
+          page_title: 'Blacklist configuration',
           screens: screens,
           blacklist: blacklist
         }));
