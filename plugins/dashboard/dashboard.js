@@ -56,15 +56,25 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
       return unauthorized(res);
     }
 
-    var file = fs.readFileSync(__dirname + '/../../' + self.config.htpasswd, 'utf8');
-    htpasswd.authenticate(user.name, user.pass, file).then(function (auth) {
-      if (auth) {
-        return next();
+    try {
+      var file = fs.readFileSync(__dirname + '/../../' + self.config.htpasswd, 'utf8');
+      htpasswd.authenticate(user.name, user.pass, file).then(function (auth) {
+        if (auth) {
+          return next();
+        }
+        else {
+          return unauthorized(res);
+        }
+      });
+    }
+    catch (err) {
+      if (err.code === 'ENOENT') {
+        console.error('Missing the password file for dashboard authentication. Please create the htacces password file using Apache 2 utils to generate the file.');
       }
       else {
-        return unauthorized(res);
+        console.error(err.message);
       }
-    });
+    }
   };
 
   // Interpreted and loaded here as it will be used many times.
