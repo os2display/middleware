@@ -341,7 +341,7 @@ Dashboard.prototype.save = function save(list) {
   var self = this;
   var deferred = self.Q.defer();
 
-  self.jf.writeFile(self.config.blacklist, list, function (error) {
+  self.jf.writeFile(__dirname + '/../../' + self.config.blacklist, list, function (error) {
     if (error) {
       deferred.reject(new Error(error));
     }
