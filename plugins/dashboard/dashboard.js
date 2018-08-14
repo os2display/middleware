@@ -313,7 +313,7 @@ Dashboard.prototype.load = function load() {
   var self = this;
   var deferred = self.Q.defer();
 
-  self.jf.readFile(self.config.blacklist, function(error, list) {
+  self.jf.readFile(__dirname + '/../../' + self.config.blacklist, function(error, list) {
     if (error) {
       deferred.reject(new Error(error));
     }
