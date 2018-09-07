@@ -18,6 +18,7 @@
   </div>
 </div>
 
+
 <form name="blacklist" action="#">
   <div class="row no-gutters critical">
     {% for key,data in screens.all %}
@@ -39,7 +40,7 @@
             {% for screen in data %}
               <tr>
                 <td>{{ screen.id }}</td>
-                <td><input type="checkbox" {% if blacklist[key].includes(screen.id) %}checked{% endif %} name="{{ key }}-{{ screen.id }}"></td>
+                <td><input type="checkbox" {% if blacklist.hasOwnProperty(key) and blacklist[key].includes(screen.id) %}checked{% endif %} name="{{ key }}-{{ screen.id }}"></td>
                 <td>{{ screen.heartbeat }}</td>
                 <td>{{ screen.title }}</td>
               </tr>
