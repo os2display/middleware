@@ -32,38 +32,38 @@
   </div>
 </div>
 
-{% for apikey,keyScreens in screens %}
-  {% if not keyScreens.critical is empty %}
-    <div class="row no-gutters critical">
-      <table class="table text-danger">
-        <col style="width:5%">
-        <col style="width:18%">
-        <col style="width:10%">
-        <col style="width:67%">
-        <thead>
-        <tr>
-          <th>Id</th>
-          <th>Last heartbeat</th>
-          <th>Installation</th>
-          <th>Screen</th>
-        </tr>
-        </thead>
-        <tbody>
-          {% for data in keyScreens.critical %}
-            {% for screen in data %}
-              <tr>
-                <td>{{ screen.id }}</td>
-                <td>{{ screen.heartbeat }}</td>
-                <td>{{ screen.name }}</td>
-                <td>{{ screen.title }}</td>
-              </tr>
-            {% endfor %}
+<div class="row no-gutters critical">
+  <table class="table text-danger">
+    <col style="width:5%">
+    <col style="width:18%">
+    <col style="width:10%">
+    <col style="width:67%">
+    <thead>
+    <tr>
+      <th>Id</th>
+      <th>Last heartbeat</th>
+      <th>Installation</th>
+      <th>Screen</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for apikey,keyScreens in screens %}
+      {% if not keyScreens.critical is empty %}
+        {% for data in keyScreens.critical %}
+          {% for screen in data %}
+            <tr>
+              <td>{{ screen.id }}</td>
+              <td>{{ screen.heartbeat }}</td>
+              <td>{{ screen.name }}</td>
+              <td>{{ screen.title }}</td>
+            </tr>
           {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
-{% endfor %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 <div class="footer">
   <div class="row no-gutters footer--inner">
