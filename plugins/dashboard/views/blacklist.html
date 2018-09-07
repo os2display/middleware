@@ -21,32 +21,36 @@
 
 <form name="blacklist" action="#">
   <div class="row no-gutters critical">
-    {% for key,data in screens.all %}
-      <h4>{{ data[0].name }}</h4><span class="apikey">({{ key }})</span>
-      <table class="table">
-        <col style="width:5%">
-        <col style="width:10%">
-        <col style="width:20%">
-        <col style="width:65%">
-        <thead>
-        <tr>
-          <th>Id</th>
-          <th>Black listed</th>
-          <th>Last heartbeat</th>
-          <th>Name</th>
-        </tr>
-        </thead>
-        <tbody>
-            {% for screen in data %}
-              <tr>
-                <td>{{ screen.id }}</td>
-                <td><input type="checkbox" {% if blacklist.hasOwnProperty(key) and blacklist[key].includes(screen.id) %}checked{% endif %} name="{{ key }}-{{ screen.id }}"></td>
-                <td>{{ screen.heartbeat }}</td>
-                <td>{{ screen.title }}</td>
-              </tr>
-            {% endfor %}
-        </tbody>
-      </table>
+    {% for apikey,keyScreens in screens %}
+      {% for key,data in keyScreens.all %}
+        <h4>{{ data[0].name }}</h4><span class="apikey">({{ key }})</span>
+        <table class="table">
+          <col style="width:5%">
+          <col style="width:10%">
+          <col style="width:20%">
+          <col style="width:55%">
+          <col style="width:10%">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Black listed</th>
+            <th>Last heartbeat</th>
+            <th>Name</th>
+            <th>Installation</th>
+          </tr>
+          </thead>
+          <tbody>
+              {% for screen in data %}
+                <tr>
+                  <td>{{ screen.id }}</td>
+                  <td><input type="checkbox" {% if blacklist.hasOwnProperty(key) and blacklist[key].includes(screen.id) %}checked{% endif %} name="{{ key }}-{{ screen.id }}"></td>
+                  <td>{{ screen.heartbeat }}</td>
+                  <td>{{ screen.title }}</td>
+                </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+      {% endfor %}
     {% endfor %}
   </div>
 

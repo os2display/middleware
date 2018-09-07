@@ -32,36 +32,38 @@
   </div>
 </div>
 
-{% if not screens.critical is empty %}
-  <div class="row no-gutters critical">
-    <table class="table text-danger">
-      <col style="width:5%">
-      <col style="width:18%">
-      <col style="width:10%">
-      <col style="width:67%">
-      <thead>
-      <tr>
-        <th>Id</th>
-        <th>Last heartbeat</th>
-        <th>Installation</th>
-        <th>Screen</th>
-      </tr>
-      </thead>
-      <tbody>
-        {% for data in screens.critical %}
-          {% for screen in data %}
-            <tr>
-              <td>{{ screen.id }}</td>
-              <td>{{ screen.heartbeat }}</td>
-              <td>{{ screen.name }}</td>
-              <td>{{ screen.title }}</td>
-            </tr>
+{% for apikey,keyScreens in screens %}
+  {% if not keyScreens.critical is empty %}
+    <div class="row no-gutters critical">
+      <table class="table text-danger">
+        <col style="width:5%">
+        <col style="width:18%">
+        <col style="width:10%">
+        <col style="width:67%">
+        <thead>
+        <tr>
+          <th>Id</th>
+          <th>Last heartbeat</th>
+          <th>Installation</th>
+          <th>Screen</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% for data in keyScreens.critical %}
+            {% for screen in data %}
+              <tr>
+                <td>{{ screen.id }}</td>
+                <td>{{ screen.heartbeat }}</td>
+                <td>{{ screen.name }}</td>
+                <td>{{ screen.title }}</td>
+              </tr>
+            {% endfor %}
           {% endfor %}
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-{% endif %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endfor %}
 
 <div class="footer">
   <div class="row no-gutters footer--inner">
@@ -75,9 +77,9 @@
         </tr>
         </thead>
         <tbody>
-          <td>{{ screens.count.total }}</td>
-          <td>{{ screens.count.critical }}</td>
-          <td>{{ screens.count.blacklist }}</td>
+          <td>{{ counts.total }}</td>
+          <td>{{ counts.critical }}</td>
+          <td>{{ counts.blacklist }}</td>
         </tbody>
       </table>
     </div>
@@ -85,8 +87,8 @@
 </div>
 <script>
   var milisec = 0;
-  var seconds = {{ screens.expire }};
-  var refreshRate = {{ screens.expire }};
+  var seconds = {{ expire }};
+  var refreshRate = {{ expire }};
   var timerEl = document.getElementById("timer")
 
   // Update the display progress bar.

@@ -101,6 +101,17 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
    */
   app.get('/dashboard/status', self.auth, function (req, res) {
     self.buildScreenData().then(function (screens) {
+      var counts = {
+        total: 0,
+        critical: 0,
+        blacklist: 0
+      };
+      for (var key in screens) {
+        counts.total += screens[key].count.total;
+        counts.critical += screens[key].count.critical;
+        counts.blacklist += screens[key].count.blacklist;
+      }
+
       res.send(self.bashboardTemplate.render({
         page_title: 'OS2display screen',
         date: {
@@ -108,7 +119,9 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
           day: self.moment().format('D'),
           year: self.moment().format('YYYY')
         },
-        screens: screens
+        screens: screens,
+        counts: counts,
+        expire: self.config.expire
       }));
     },
     function error(error) {
@@ -166,75 +179,31 @@ Dashboard.prototype.buildScreenData = function buildScreenData() {
   var self = this;
   var deferred = self.Q.defer();
 
-  // Defined the final data structure that is used to render the page.
-  var screens = {
-    critical: {},
-    blacklist: {},
-    all: {},
-    count: {
-      total: 0,
-      critical: 0,
-      blacklist: 0
-    },
-    expire: self.config.expire
-  };
-
   // First load the blacklist, then load api keys and then loop over the api keys
   // get the screens hartbeat information by loading them.
   self.load().then(
     function (blacklist) {
       self.apikeys.load().then(
         function (keys) {
-          for (var apikey in keys) {
-            self.cache.membersOfSet('screen:' + apikey, function (err, data) {
-              self.Q().then(function () {
-                var screenPromises = [];
-                // Loop over screens and build promises array.
-                for (var i in data) {
-                  screenPromises.push(self.loadScreen(apikey, keys[apikey].name, data[i]));
-                }
+          self.Q().then(function () {
+            var keysPromises = [];
+            for (var apikey in keys) {
+              keysPromises.push(self.loadKeyScreens(apikey, keys[apikey].name, blacklist));
+            }
 
-                return screenPromises;
-              })
-              .all()
-              .then(function (loadedScreens) {
-                // When all promises (screens are load) resovled loop over the screens.
-                for (var i in loadedScreens) {
-                  var screen = loadedScreens[i];
-
-                  // Check blacklist.
-                  if (blacklist.hasOwnProperty(screen.apikey) && blacklist[screen.apikey].includes(screen.id)) {
-                    if (!screens.blacklist.hasOwnProperty(screen.apikey)) {
-                      screens.blacklist[screen.apikey] = [];
-                    }
-                    screens.blacklist[screen.apikey].push(screen);
-                    screens.count.blacklist++;
-                  }
-                  else {
-                    // Check if beat has expire and add it to "critical" bucket.
-                    if (screen.expired) {
-                      if (!screens.critical.hasOwnProperty(screen.apikey)) {
-                        screens.critical[screen.apikey] = [];
-                      }
-                      screens.critical[screen.apikey].push(screen);
-                      screens.count.critical++;
-                    }
-                  }
-
-                  // Add all beats to the all array.
-                  if (!screens.all.hasOwnProperty(screen.apikey)) {
-                    screens.all[screen.apikey] = [];
-                  }
-                  screens.all[screen.apikey].push(screen);
-                  screens.count.total++;
-                }
-                deferred.resolve(screens);
-              },
-              function (error) {
-                deferred.reject(error);
-              })
-            });
-          }
+            return keysPromises;
+          })
+          .all()
+          .then(function (screens) {
+            var ret = {};
+            for (var i in screens) {
+              ret[screens[i].apikey] = screens[i];
+            }
+            deferred.resolve(ret);
+          },
+          function (error) {
+            deferred.reject(error);
+          })
         },
         function (error) {
           deferred.reject(error);
@@ -248,6 +217,87 @@ Dashboard.prototype.buildScreenData = function buildScreenData() {
 
   return deferred.promise;
 };
+
+/**
+ * Load screens based on apikey.
+ *
+ * @param string apikey
+ *   The api-key.
+ * @param string name
+ *   Name of the installation.
+ * @param object blacklist.
+ *   The blacklisted screens.
+ *
+ * @return promises
+ */
+Dashboard.prototype.loadKeyScreens = function loadKeyScreens(apikey, name, blacklist) {
+  var self = this;
+  var deferred = self.Q.defer();
+
+  // Defined the final data structure that is used to render the page.
+  var screens = {
+    apikey: apikey,
+    critical: {},
+    blacklist: {},
+    all: {},
+    count: {
+      total: 0,
+      critical: 0,
+      blacklist: 0
+    }
+  };
+
+  self.cache.membersOfSet('screen:' + apikey, function (err, data) {
+    self.Q().then(function () {
+      var screenPromises = [];
+      // Loop over screens and build promises array.
+      for (var i in data) {
+        screenPromises.push(self.loadScreen(apikey, name, data[i]));
+      }
+
+      return screenPromises;
+    })
+    .all()
+    .then(function (loadedScreens) {
+      // When all promises (screens are load) resovled loop over the screens.
+      for (var i in loadedScreens) {
+        var screen = loadedScreens[i];
+
+        // Check blacklist.
+        if (blacklist.hasOwnProperty(screen.apikey) && blacklist[screen.apikey].includes(screen.id)) {
+          if (!screens.blacklist.hasOwnProperty(screen.apikey)) {
+            screens.blacklist[screen.apikey] = [];
+          }
+          screens.blacklist[screen.apikey].push(screen);
+          screens.count.blacklist++;
+        }
+        else {
+          // Check if beat has expire and add it to "critical" bucket.
+          if (screen.expired) {
+            if (!screens.critical.hasOwnProperty(screen.apikey)) {
+              screens.critical[screen.apikey] = [];
+            }
+            screens.critical[screen.apikey].push(screen);
+            screens.count.critical++;
+          }
+        }
+
+        // Add all beats to the all array.
+        if (!screens.all.hasOwnProperty(screen.apikey)) {
+          screens.all[screen.apikey] = [];
+        }
+        screens.all[screen.apikey].push(screen);
+        screens.count.total++;
+      }
+      deferred.resolve(screens);
+    },
+    function (error) {
+      deferred.reject(error);
+    })
+  });
+
+  return deferred.promise;
+}
 
 /**
  * Helper function to load a screen.
