@@ -99,7 +99,7 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
   /**
    * Dashboard status callback.
    */
-  app.get('/dashboard/status', self.auth, function (req, res) {
+  app.get('/dashboard/status', function (req, res) {
     self.buildScreenData().then(function (screens) {
       var counts = {
         total: 0,
