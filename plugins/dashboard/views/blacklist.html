@@ -44,7 +44,7 @@
                 <tr>
                   <td>{{ screen.id }}</td>
                   <td><input type="checkbox" {% if blacklist.hasOwnProperty(key) and blacklist[key].includes(screen.id) %}checked{% endif %} name="{{ key }}-{{ screen.id }}"></td>
-                  <td>{{ screen.heartbeat }}</td>
+                  <td>{{ screen.time }}</td>
                   <td>{{ screen.name }}</td>
                   <td>{{ screen.title }}</td>
                 </tr>
