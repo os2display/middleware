@@ -118,8 +118,6 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
         counts.blacklist += screens[key].count.blacklist;
       }
 
-      //self.moment.unix(screenObj.heartbeat).format('DD/MM/YY - HH:mm:ss')
-
       // Sort screens by heartbeat.
       criticalScreens.sort(function compare(a, b) {
         if (a.heartbeat < b.heartbeat) {
