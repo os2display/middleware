@@ -121,10 +121,10 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
       // Sort screens by heartbeat.
       criticalScreens.sort(function compare(a, b) {
         if (a.heartbeat < b.heartbeat) {
-          return -1;
+          return 1;
         }
         if (a.heartbeat > b.heartbeat) {
-          return 1;
+          return -1;
         }
         return 0;
       });
