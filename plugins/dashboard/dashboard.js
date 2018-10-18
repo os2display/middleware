@@ -106,11 +106,30 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
         critical: 0,
         blacklist: 0
       };
+
+      var criticalScreens = [];
       for (var key in screens) {
+        // Get all the critical screens.
+        for (var i in screens[key].critical[key]) {
+          criticalScreens.push(screens[key].critical[key][i]);
+        }
         counts.total += screens[key].count.total;
         counts.critical += screens[key].count.critical;
         counts.blacklist += screens[key].count.blacklist;
       }
+
+      //self.moment.unix(screenObj.heartbeat).format('DD/MM/YY - HH:mm:ss')
+
+      // Sort screens by heartbeat.
+      criticalScreens.sort(function compare(a, b) {
+        if (a.heartbeat < b.heartbeat) {
+          return -1;
+        }
+        if (a.heartbeat > b.heartbeat) {
+          return 1;
+        }
+        return 0;
+      });
 
       res.send(self.bashboardTemplate.render({
         page_title: 'OS2display screen',
@@ -119,7 +138,7 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
           day: self.moment().format('D'),
           year: self.moment().format('YYYY')
         },
-        screens: screens,
+        screens: criticalScreens,
         counts: counts,
         expire: self.config.expire
       }));
@@ -221,11 +240,11 @@ Dashboard.prototype.buildScreenData = function buildScreenData() {
 /**
  * Load screens based on apikey.
  *
- * @param string apikey
+ * @param {string} apikey
  *   The api-key.
- * @param string name
+ * @param {string} name
  *   Name of the installation.
- * @param object blacklist.
+ * @param {object} blacklist.
  *   The blacklisted screens.
  *
  * @return promises
@@ -297,7 +316,7 @@ Dashboard.prototype.loadKeyScreens = function loadKeyScreens(apikey, name, black
   });
 
   return deferred.promise;
-}
+};
 
 /**
  * Helper function to load a screen.
@@ -323,7 +342,8 @@ Dashboard.prototype.loadScreen = function loadScreen(apikey, name, screenId) {
         name: name,
         id: screenObj.id,
         title: screenObj.title,
-        heartbeat: self.moment.unix(screenObj.heartbeat).format('D. MMMM YYYY HH:mm:ss'),
+        heartbeat: screenObj.heartbeat,
+        time: self.moment.unix(screenObj.heartbeat).format('D. MMM YY - HH:mm:ss'),
         expired: self.expired(screenObj.heartbeat)
       })
     },
@@ -401,18 +421,6 @@ Dashboard.prototype.save = function save(list) {
   });
 
   return deferred.promise;
-};
-
-/**
- * Validate that the role is admin.
- *
- * @param req
- *   Express request object.
- */
-Dashboard.prototype.validateCall = function validateCall(req) {
-  "use strict";
-
-  return (req.hasOwnProperty('user')) && (req.user.role === 'admin');
 };
 
 /**

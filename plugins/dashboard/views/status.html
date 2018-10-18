@@ -47,20 +47,16 @@
     </tr>
     </thead>
     <tbody>
-    {% for apikey,keyScreens in screens %}
-      {% if not keyScreens.critical is empty %}
-        {% for data in keyScreens.critical %}
-          {% for screen in data %}
-            <tr>
-              <td>{{ screen.id }}</td>
-              <td>{{ screen.heartbeat }}</td>
-              <td>{{ screen.name }}</td>
-              <td>{{ screen.title }}</td>
-            </tr>
-          {% endfor %}
-        {% endfor %}
-      {% endif %}
-    {% endfor %}
+    {% if not screens is empty %}
+      {% for screen in screens %}
+        <tr>
+          <td>{{ screen.id }}</td>
+          <td>{{ screen.time }}</td>
+          <td>{{ screen.name }}</td>
+          <td>{{ screen.title }}</td>
+        </tr>
+      {% endfor %}
+    {% endif %}
     </tbody>
   </table>
 </div>
