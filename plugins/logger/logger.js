@@ -30,7 +30,10 @@ function useModeConsoleJson(loggerInstance, logs, levels) {
           colorize: false,
           showLevel: true,
           json: true,
-          timestamp: true
+          timestamp: true,
+          stringify: function (obj) {
+            return JSON.stringify(obj);
+          }
         })
       ],
       exitOnError: false
@@ -50,7 +53,10 @@ function useModeConsoleJson(loggerInstance, logs, levels) {
         colorize: false,
         showLevel: true,
         json: true,
-        timestamp: true
+        timestamp: true,
+        stringify: function (obj) {
+          return JSON.stringify(obj);
+        }
       })
     ],
     exitOnError: true
