@@ -17,6 +17,6 @@
   },
   "dependencies": {
     "q": "^1.4.1",
-    "request-json": "^0.5.3"
+    "request-json": "^0.6.3"
   }
 }

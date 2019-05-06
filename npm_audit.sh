@@ -1,21 +1,22 @@
 #!/bin/bash
 
+echo 'npm audit packages...'
+echo '---------------------'
+echo ''
+
 # Install main modules
-npm install
+npm audit
 
 # Install plugin dependencies.
 for folder in plugins/*; do
   if [ -d $folder ]; then
     cd $folder
 
-    echo ''
+    echo '------------------------------------------'
     echo ''
     echo $folder
 
-    rm -rf node_modules
-    npm install
     npm audit
-    npm audit fix
     cd ../..
   fi
 done
