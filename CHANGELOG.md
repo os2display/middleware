@@ -1,4 +1,4 @@
-# itk-os2display/middleware
+# os2display/middleware
 
 ## 5.1.0
 
