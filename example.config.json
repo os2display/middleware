@@ -18,6 +18,10 @@
     "auth": null,
     "db": 0
   },
+  "dashboard": {
+    "htpasswd": "dashboard.htpasswd",
+    "blacklist": "blacklist.json",
+    "expire": 900
+  },
   "apikeys": "apikeys.json",
-  "sentryUrl": "https://xxx:xxx@app.getsentry.com/xxx"
 }

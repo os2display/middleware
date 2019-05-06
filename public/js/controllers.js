@@ -313,11 +313,11 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
     }
 
     /**
-     * Return TURE if timestamp is older than 10 min else FALSE.
+     * Return TRUE if timestamp is older than 10 min else FALSE.
      */
     $scope.expired = function expired(timestamp) {
       return timestamp < Math.round((new Date()).getTime() / 1000) - 900;
-    }
+    };
 
     /**
      * Refresh heartbeats callback.
@@ -355,7 +355,7 @@ app.controller('StatusController', ['$scope', '$window', '$location', 'ngOverlay
     };
 
     /**
-     * Reload screen.
+     * Logout screen.
      *
      * @param screenId
      *   The id of the screen to reload.

@@ -1,0 +1,116 @@
+<html>
+<Head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="/css/dashboard.css" media="all">
+</Head>
+<body>
+<div class="row no-gutters">
+  <div class="col">
+    <div class="timer--wrapper">
+      <div class="timer" id="timer">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row no-gutters header--inner align-items-center">
+  <div class="col-3">
+    <img src="https://os2.eu/sites/default/files/styles/node_banner/public/products/display_banner_1240x440.png?itok=xYIcx3Tl" class="logo">
+  </div>
+  <div class="col-6">
+    <h1 class="header">{{ page_title }}</h1>
+  </div>
+  <div class="col-3">
+    <div class="calendar--wrapper">
+      <div class="calendar">
+        <div class="month">{{ date.month}}</div>
+        <div class="date">{{ date.day }}</div>
+        <div class="year">{{ date.year }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row no-gutters critical">
+  <table class="table text-danger">
+    <col style="width:5%">
+    <col style="width:18%">
+    <col style="width:10%">
+    <col style="width:67%">
+    <thead>
+    <tr>
+      <th>Id</th>
+      <th>Last heartbeat</th>
+      <th>Installation</th>
+      <th>Screen</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if not screens is empty %}
+      {% for screen in screens %}
+        <tr>
+          <td>{{ screen.id }}</td>
+          <td>{{ screen.time }}</td>
+          <td>{{ screen.name }}</td>
+          <td>{{ screen.title }}</td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<div class="footer">
+  <div class="row no-gutters footer--inner">
+    <div class="col-8 col-offset-2 mx-auto summed-updates">
+      <table class="table text-info">
+        <thead>
+        <tr>
+          <th># of screen</th>
+          <th>Critical</th>
+          <th>Black listed</th>
+        </tr>
+        </thead>
+        <tbody>
+          <td>{{ counts.total }}</td>
+          <td>{{ counts.critical }}</td>
+          <td>{{ counts.blacklist }}</td>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  var milisec = 0;
+  var seconds = {{ expire }};
+  var refreshRate = {{ expire }};
+  var timerEl = document.getElementById("timer")
+
+  // Update the display progress bar.
+  function display() {
+    if (milisec <= 0) {
+      milisec = 9;
+      seconds -= 1;
+    }
+    if (seconds <= -1) {
+      milisec = 0;
+      seconds += 1;
+    }
+    else {
+      milisec -= 1;
+    }
+
+    var percentWidth = (seconds + milisec/10)/refreshRate * 100;
+    timerEl.style.width = percentWidth + "%";
+    if (seconds === 0 && milisec === 0) {
+      location.reload();
+    }
+    else {
+      setTimeout("display()", 100);
+    }
+  }
+  display();
+</script>
+</body>
+</html>
