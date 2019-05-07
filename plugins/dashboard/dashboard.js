@@ -158,19 +158,20 @@ var Dashboard = function Admin(app, logger, apikeys, cache, Screen, options) {
     });
 
     self.buildScreenData().then(function (screens) {
-
       // Sort screens by name for each installation.
       for (var key in screens) {
-        // Sort screens by name.
-        screens[key].all[key].sort(function compare(a, b) {
-          if (a.title < b.title) {
-            return -1;
-          }
-          if (a.title > b.title) {
-            return 1;
-          }
-          return 0;
-        });
+        if (screens[key].length > 1) {
+          // Sort screens by name.
+          screens[key].all[key].sort(function compare(a, b) {
+            if (a.title < b.title) {
+              return -1;
+            }
+            if (a.title > b.title) {
+              return 1;
+            }
+            return 0;
+          });
+        }
       }
 
       self.load().then(function (blacklist) {
