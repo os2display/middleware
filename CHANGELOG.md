@@ -1,6 +1,6 @@
 # os2display/middleware
 
-## 5.1.0
+## 6.0.0
 
 * Added dashboard.
 * Updated modules.
