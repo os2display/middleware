@@ -5,7 +5,8 @@
   "main": "logger.js",
   "private": true,
   "dependencies": {
-    "winston": "^1.1.1"
+    "winston": "^3.0.0",
+    "winston-daily-rotate-file": "^3.2.1"
   },
   "plugin": {
     "provides": [

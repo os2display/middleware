@@ -5,7 +5,7 @@
   "main": "apikeys.js",
   "private": true,
   "dependencies": {
-    "jsonfile": "^2.0.1",
+    "jsonfile": "^4.0.0",
     "q": "^1.4.1"
   },
   "plugin": {

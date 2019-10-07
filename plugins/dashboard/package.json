@@ -1,0 +1,25 @@
+{
+  "name": "Dashboard",
+  "description": "Provides dashbord with status",
+  "version": "0.0.1",
+  "main": "dashboard.js",
+  "private": true,
+  "dependencies": {
+    "basic-auth": "^2.0.0",
+    "htpasswd-auth": "^2.0.1",
+    "jsonfile": "^4.0.0",
+    "moment": "^2.22.2",
+    "q": "^1.4.1",
+    "twig": "^1.12.0"
+  },
+  "plugin": {
+    "consumes": [
+      "app",
+      "logger",
+      "apikeys",
+      "cache",
+      "screen",
+      "channel"
+    ]
+  }
+}

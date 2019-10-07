@@ -9,6 +9,7 @@ var path = require('path');
 
 // NPM modules.
 var winston = require('winston');
+var DailyRotateFile = require('winston-daily-rotate-file');
 
 /**
  * Define the Base object (constructor).
@@ -16,20 +17,18 @@ var winston = require('winston');
 var Logger = function Logger(logs) {
   "use strict";
 
-  var levels = winston.config.syslog.levels;
-  levels['socket'] = 8;
-  winston.setLevels(levels);
-
   if (logs.hasOwnProperty('info')) {
-    this.infoLog = new (winston.Logger)({
-      levels: levels,
+    this.infoLog = winston.createLogger({
+      level: 'info',
       transports: [
-        new (winston.transports.DailyRotateFile)({
+        new DailyRotateFile({
           name: 'info-file',
           filename: path.join(__dirname, '../../' + logs.info),
           level: 'info',
-          datePattern: '.dd-MM-yyTHH',
-          colorize: false
+          timestamp: true,
+          json: false,
+          keep: 30,
+          compress: false
         })
       ],
       exitOnError: false
@@ -37,15 +36,17 @@ var Logger = function Logger(logs) {
   }
 
   if (logs.hasOwnProperty('debug')) {
-    this.debugLog = new (winston.Logger)({
-      levels: levels,
+    this.debugLog = winston.createLogger({
+      level: 'debug',
       transports: [
-        new (winston.transports.DailyRotateFile)({
+        new DailyRotateFile({
           name: 'debug-file',
           filename: path.join(__dirname, '../../' + logs.debug),
           level: 'debug',
-          datePattern: '.dd-MM-yyTHH',
-          colorize: false
+          timestamp: true,
+          json: false,
+          keep: 30,
+          compress: false
         })
       ],
       exitOnError: false
@@ -53,15 +54,17 @@ var Logger = function Logger(logs) {
   }
 
   if (logs.hasOwnProperty('error')) {
-    this.errorLog = new (winston.Logger)({
-      levels: levels,
+    this.errorLog = winston.createLogger({
+      level: 'error',
       transports: [
-        new (winston.transports.DailyRotateFile)({
+        new DailyRotateFile({
           name: 'error-file',
           filename: path.join(__dirname, '../../' + logs.error),
           level: 'error',
-          datePattern: '.dd-MM-yyTHH',
-          colorize: false
+          timestamp: true,
+          json: false,
+          keep: 30,
+          compress: false
         })
       ],
       exitOnError: false
@@ -69,34 +72,20 @@ var Logger = function Logger(logs) {
   }
 
   if (logs.hasOwnProperty('socket')) {
-    this.socketLog = new (winston.Logger)({
-      levels: levels,
+    this.socketLog = winston.createLogger({
+      level: 'info',
       transports: [
-        new (winston.transports.DailyRotateFile)({
+        new DailyRotateFile({
           name: 'socket-file',
           filename: path.join(__dirname, '../../' + logs.socket),
           level: 'socket',
-          datePattern: '.dd-MM-yyTHH',
-          colorize: false
+          timestamp: true,
+          json: false,
+          keep: 30,
+          compress: false
         })
       ],
       exitOnError: false
-    });
-  }
-
-  if (logs.hasOwnProperty('exception')) {
-    this.excepLog = new (winston.Logger)({
-      levels: levels,
-      transports: [
-        new (winston.transports.DailyRotateFile)({
-          name: 'exceptions-file',
-          filename: path.join(__dirname, '../../' + logs.exception),
-          datePattern: '.dd-MM-yyTHH',
-          handleExceptions: true,
-          humanReadableUnhandledException: true
-        })
-      ],
-      exitOnError: true
     });
   }
 };
@@ -111,7 +100,10 @@ Logger.prototype.error = function error(message) {
   "use strict";
 
   if (this.errorLog !== undefined) {
-    this.errorLog.error(message);
+    this.errorLog.error({
+      level: 'error',
+      message: message
+    });
   }
 };
 
@@ -125,7 +117,10 @@ Logger.prototype.info = function info(message) {
   "use strict";
 
   if (this.infoLog !== undefined) {
-    this.infoLog.info(message);
+    this.infoLog.info({
+      level: 'info',
+      message: message
+    });
   }
 };
 
@@ -139,7 +134,10 @@ Logger.prototype.debug = function debug(message) {
   "use strict";
 
   if (this.debugLog !== undefined) {
-    this.debugLog.debug(message);
+    this.debugLog.debug({
+      level: 'debug',
+      message: message
+    });
   }
 };
 
@@ -154,10 +152,13 @@ Logger.prototype.socket = function socket(message, data) {
 
   if (this.socketLog !== undefined) {
     if (data !== undefined) {
-      this.socketLog.log('socket', message + ' <-:-> ', JSON.stringify(data));
+      this.socketLog.log({
+        level: 'info',
+        message: message + ' <-:-> ' + JSON.stringify(data)
+      });
     }
     else {
-      this.socketLog.log('socket', message);
+      this.socketLog.log('info', message);
     }
   }
 };
